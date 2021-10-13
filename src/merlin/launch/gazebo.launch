@@ -1,0 +1,13 @@
+
+<launch>
+  <!-- TODO: Add param to disable IRL Controllers -->
+  <include file="$(find merlin)/launch/controllers.launch">
+  </include>
+ <param command="$(find xacro)/xacro $(find merlin)/urdf/merlin_arm.xacro" name="robot_description"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="false" />
+  </include>
+
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 0 -y 0 -z 0.1 -model merlin_arm -J shoulder_joint -1.5 -J elbow_joint 1.0" />
+</launch>

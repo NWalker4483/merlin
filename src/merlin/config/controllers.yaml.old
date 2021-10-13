@@ -1,0 +1,16 @@
+
+# Publish all joint states -----------------------------------
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# Position Controllers --------------------------------------
+waist_joint_position_controller:
+  type: position_controllers/JointTrajectoryController
+  joint: waist_joint
+shoulder_joint_position_controller:
+  type: position_controllers/JointTrajectoryController
+  joint: shoulder_joint
+elbow_joint_position_controller:
+  type: position_controllers/JointTrajectoryController
+  joint: elbow_joint
