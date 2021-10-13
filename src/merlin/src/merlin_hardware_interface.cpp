@@ -3,8 +3,7 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <merlin_hardware_interface/merlin_hardware_interface.h>
-#include <sstream>
-
+// #include <sstream>
 
 constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
 const int BUFFER_SIZE = 4;
@@ -14,7 +13,6 @@ using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
-
 
 namespace merlin_hardware_interface
 {
@@ -31,38 +29,70 @@ namespace merlin_hardware_interface
   }
 
   MerlinHardwareInterface::~MerlinHardwareInterface() {}
+  void MerlinHardwareInterface::init_serial()
+  {
+    serial_port = open("/dev/ttyACM0", O_RDWR);
 
+    // Check for errors
+    if (serial_port < 0)
+    {
+      printf("Error %i from open: %s\n", errno, strerror(errno));
+    }
+
+    // Create new termios struct, we call it 'tty' for convention
+    // No need for "= {0}" at the end as we'll immediately write the existing
+    // config to this struct
+    struct termios tty;
+
+    // Read in existing settings, and handle any error
+    // NOTE: This is important! POSIX states that the struct passed to tcsetattr()
+    // must have been initialized with a call to tcgetattr() overwise behaviour
+    // is undefined
+    if (tcgetattr(serial_port, &tty) != 0)
+    {
+      printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+    }
+
+    tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+
+    tty.c_cflag &= ~CSTOPB;  // Clear stop field, only one stop bit used in communication (most common)
+    tty.c_cflag &= ~CSIZE;   // Clear all the size bits, then use one of the statements below
+    tty.c_cflag |= CS8;      // 8 bits per byte (most common)
+    tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+
+    tty.c_lflag &= ~ICANON; // Disable canonical mode
+
+    tty.c_lflag &= ~ECHO;   // Disable echo
+    tty.c_lflag &= ~ECHOE;  // Disable erasure
+    tty.c_lflag &= ~ECHONL; // Disable new-line echo
+
+    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable any special handling of received bytes
+
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+
+    tty.c_cc[VTIME] = 10; // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VMIN] = 0;
+
+    cfsetispeed(&tty, B115200);
+    cfsetospeed(&tty, B115200);
+
+    // Save tty settings, also checking for error
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0)
+    {
+      printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+    }
+  }
   void MerlinHardwareInterface::init()
   {
     // Instantiate SerialPort object.
-
-    // try
-    // {
-    //   // Open the Serial Ports at the desired hardware devices.
-    //   serial_port_.Open(SERIAL_PORT_1);
-    // }
-    // catch (const OpenFailed &)
-    // {
-    //   std::cerr << "The serial ports did not open correctly." << std::endl;
-    //   // return  LibSerial::EXIT_FAILURE ;
-    // }
-    // // Set the baud rates.
-    // serial_port_.SetBaudRate(BaudRate::BAUD_115200);
-
-    // // Set the number of data bits.
-    // serial_port_.SetCharacterSize(CharacterSize::CHAR_SIZE_8);
-
-    // // Set the hardware flow control.
-    // serial_port_.SetFlowControl(FlowControl::FLOW_CONTROL_NONE);
-
-    // // Set the parity.
-    // serial_port_.SetParity(Parity::PARITY_NONE);
-
-    // // Set the number of stop bits.
-    // serial_port_.SetStopBits(StopBits::STOP_BITS_1);
-
-    // Get joint names
-    nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
+    init_serial()
+        // Get joint names
+        nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
     num_joints_ = joint_names_.size();
 
     // Resize vectors
@@ -77,7 +107,7 @@ namespace merlin_hardware_interface
     // Initialize Controller
     for (int i = 0; i < num_joints_; ++i)
     {
-       // Create joint state interface
+      // Create joint state interface
       JointStateHandle jointStateHandle(joint_names_[i], &joint_position_[i],
                                         &joint_velocity_[i], &joint_effort_[i]);
       joint_state_interface_.registerHandle(jointStateHandle);
@@ -89,10 +119,10 @@ namespace merlin_hardware_interface
       SoftJointLimits softLimits;
       getJointLimits(joint_names_[i], nh_, limits);
       PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle,
-                                                          limits, softLimits);
+                                                      limits, softLimits);
       positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
       position_joint_interface_.registerHandle(jointPositionHandle);
-     }
+    }
 
     registerInterface(&joint_state_interface_);
     registerInterface(&position_joint_interface_);
@@ -109,54 +139,38 @@ namespace merlin_hardware_interface
 
   void MerlinHardwareInterface::read()
   {
-    // // Write a single byte of data to the serial ports.
-    // serial_port_.WriteByte((char)'R');
+    unsigned char msg[] = {'R'};
+    write(serial_port, msg, sizeof(msg));
 
-    // // Wait until the data has actually been transmitted.
-    // serial_port_.DrainWriteBuffer();
+    for (int i = 0; i < num_joints_; i++)
+    {
+      // Allocate memory for read buffer, set size according to your needs
+      char read_buf[4];
+      float temp;
 
-    // for (int i = 0; i < num_joints_; i++)
-    // {
-    //   // Specify a timeout value (in milliseconds).
-    //   size_t timeout_milliseconds = 500; // Testing
+      // Read bytes. The behaviour of read() (e.g. does it block?,
+      // how long does it block for?) depends on the configuration
+      // settings above, specifically VMIN and VTIME
+      int n = read(serial_port, &read_buf, sizeof(read_buf));
+      memcpy(&temp, &read_buf, sizeof(temp));
+      joint_position_[i] = (double)temp;
+    }
 
-    //   // Read a whole array of data from the serial port.
-      
-    //   DataBuffer input_buffer; // [BUFFER_SIZE];
-    //   float temp;
-    //   char t2;
-    //   try
-    //   {
-    //     // Read the appropriate number of bytes from each serial port.
-    //     serial_port_.ReadByte(t2, 500);
-    //     std::cout << t2<< std::endl;
-    //     //serial_port_.Read(input_buffer, 1, timeout_milliseconds);
-    //     //memcpy(&temp, &input_buffer, sizeof(temp));
-    //     //joint_position_[i] = 0;(double) temp;
-    //   }
-    //   catch (const ReadTimeout &)
-    //   {
-    //     std::cerr << "The Read() call has timed out." << std::endl;
-    //   }
-    // }
-  }
+    void MerlinHardwareInterface::write(ros::Duration elapsed_time)
+    {
+      positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+      unsigned char msg[] = {'W'};
+      write(serial_port, msg, sizeof(msg));
 
-  void MerlinHardwareInterface::write(ros::Duration elapsed_time)
-  {
-  //   positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
-  //   // Write a single byte of data to the serial ports.
-  //   serial_port_.WriteByte('W');
-
-  //   // Wait until the data has actually been transmitted.
-  //   serial_port_.DrainWriteBuffer();
-  //   union {
-  //     float val;
-  //     char array[BUFFER_SIZE];
-  //   } conv;
-  //   for (int i = 0; i < num_joints_; i++)
-  //   {
-  //     conv.val = (float)joint_position_command_[i];
-  //     // serial_port_.Write( conv.array, BUFFER_SIZE );
-  //   }
-  }
-} // namespace merlin_hardware_interface
+      union
+      {
+        float val;
+        char array[4];
+      } conv;
+      for (int i = 0; i < num_joints_; i++)
+      {
+        conv.val = (float)joint_position_command_[i];
+        write(serial_port, conv.array, 4);
+      }
+    }
+  } // namespace merlin_hardware_interface

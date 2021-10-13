@@ -13,7 +13,16 @@
 #include <ros/ros.h>
 #include <merlin_hardware_interface/merlin_hardware.h>
 #include <iostream>
+
+// C library headers
 #include <stdio.h>
+#include <string.h>
+
+// Linux headers
+#include <fcntl.h> // Contains file controls like O_RDWR
+#include <errno.h> // Error integer and strerror() function
+#include <termios.h> // Contains POSIX terminal control definitions
+#include <unistd.h> // write(), read(), close()
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -31,13 +40,14 @@ public:
   MerlinHardwareInterface(ros::NodeHandle &nh);
   ~MerlinHardwareInterface();
   void init();
+  void init_serial();
   void update(const ros::TimerEvent &e);
   void read();
   void write(ros::Duration elapsed_time);
 
 protected:
   ros::NodeHandle nh_;
-  FILE *serial_port;
+  int serial_port;
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
