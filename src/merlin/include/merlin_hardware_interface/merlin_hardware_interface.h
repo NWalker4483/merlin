@@ -22,7 +22,9 @@
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
 #include <termios.h> // Contains POSIX terminal control definitions
+namespace serial {
 #include <unistd.h> // write(), read(), close()
+}
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;

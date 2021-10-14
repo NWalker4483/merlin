@@ -4,9 +4,20 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <merlin_hardware_interface/merlin_hardware_interface.h>
 // #include <sstream>
+#include <unistd.h> // write(), read(), close()
+#include <stdio.h>
+#include <stdlib.h>
+//#include <ioctl.h>
+#include <fcntl.h>
+#include <termios.h>
 
-constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
+constexpr const char *const SERIAL_PORT_1 = "/dev/configACM0";
 const int BUFFER_SIZE = 4;
+
+union open_float {
+  float val = 0;
+  char array[4];
+};
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -31,68 +42,65 @@ namespace merlin_hardware_interface
   MerlinHardwareInterface::~MerlinHardwareInterface() {}
   void MerlinHardwareInterface::init_serial()
   {
-    serial_port = open("/dev/ttyACM0", O_RDWR);
+
+   /* Open the file descriptor in non-blocking mode */
+    serial_port = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
 
     // Check for errors
     if (serial_port < 0)
     {
       printf("Error %i from open: %s\n", errno, strerror(errno));
     }
-
-    // Create new termios struct, we call it 'tty' for convention
-    // No need for "= {0}" at the end as we'll immediately write the existing
-    // config to this struct
-    struct termios tty;
-
-    // Read in existing settings, and handle any error
-    // NOTE: This is important! POSIX states that the struct passed to tcsetattr()
-    // must have been initialized with a call to tcgetattr() overwise behaviour
-    // is undefined
-    if (tcgetattr(serial_port, &tty) != 0)
-    {
-      printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
-    }
-
-    tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
-
-    tty.c_cflag &= ~CSTOPB;  // Clear stop field, only one stop bit used in communication (most common)
-    tty.c_cflag &= ~CSIZE;   // Clear all the size bits, then use one of the statements below
-    tty.c_cflag |= CS8;      // 8 bits per byte (most common)
-    tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
-
-    tty.c_lflag &= ~ICANON; // Disable canonical mode
-
-    tty.c_lflag &= ~ECHO;   // Disable echo
-    tty.c_lflag &= ~ECHOE;  // Disable erasure
-    tty.c_lflag &= ~ECHONL; // Disable new-line echo
-
-    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
-
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
-
-    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable any special handling of received bytes
-
-    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
-
-    tty.c_cc[VTIME] = 10; // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
-    tty.c_cc[VMIN] = 0;
-
-    cfsetispeed(&tty, B115200);
-    cfsetospeed(&tty, B115200);
-
-    // Save tty settings, also checking for error
-    if (tcsetattr(serial_port, TCSANOW, &tty) != 0)
-    {
-      printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
-    }
+   /* Set up the control structure */
+ struct termios toptions;
+ 
+ /* Get currently set options for the tty */
+ tcgetattr(serial_port, &toptions);
+ 
+/* Set custom options */
+ 
+/* 9600 baud */
+ cfsetispeed(&toptions, B115200);
+ cfsetospeed(&toptions, B115200);
+ /* 8 bits, no parity, no stop bits */
+ toptions.c_cflag &= ~PARENB;
+ toptions.c_cflag &= ~CSTOPB;
+ toptions.c_cflag &= ~CSIZE;
+ toptions.c_cflag |= CS8;
+ /* no hardware flow control */
+ toptions.c_cflag &= ~CRTSCTS;
+ /* enable receiver, ignore status lines */
+ toptions.c_cflag |= CREAD | CLOCAL;
+ /* disable input/output flow control, disable restart chars */
+ toptions.c_iflag &= ~(IXON | IXOFF | IXANY);
+ /* disable canonical input, disable echo,
+ disable visually erase chars,
+ disable terminal-generated signals */
+ toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+ /* disable output processing */
+ toptions.c_oflag &= ~OPOST;
+ 
+/* wait for 12 characters to come in before read returns */
+/* WARNING! THIS CAUSES THE read() TO BLOCK UNTIL ALL */
+/* CHARACTERS HAVE COME IN! */
+ toptions.c_cc[VMIN] = 4;
+ /* no minimum time to wait before read returns */
+ toptions.c_cc[VTIME] = 10;
+ 
+/* commit the options */
+ tcsetattr(serial_port, TCSANOW, &toptions);
+ 
+/* Wait for the Arduino to reset */
+ usleep(1000*1000);
+ /* Flush anything already in the serial buffer */
+ tcflush(serial_port, TCIFLUSH);
   }
   void MerlinHardwareInterface::init()
   {
     // Instantiate SerialPort object.
-    init_serial()
-        // Get joint names
-        nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
+    init_serial();
+    // Get joint names
+    nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
     num_joints_ = joint_names_.size();
 
     // Resize vectors
@@ -122,7 +130,7 @@ namespace merlin_hardware_interface
                                                       limits, softLimits);
       positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
       position_joint_interface_.registerHandle(jointPositionHandle);
-    }
+    };
 
     registerInterface(&joint_state_interface_);
     registerInterface(&position_joint_interface_);
@@ -139,38 +147,36 @@ namespace merlin_hardware_interface
 
   void MerlinHardwareInterface::read()
   {
-    unsigned char msg[] = {'R'};
-    write(serial_port, msg, sizeof(msg));
+    char msg[] = {'R'};
+    ::write(serial_port, msg, sizeof(msg));
 
     for (int i = 0; i < num_joints_; i++)
     {
-      // Allocate memory for read buffer, set size according to your needs
-      char read_buf[4];
-      float temp;
-
+      open_float temp;
       // Read bytes. The behaviour of read() (e.g. does it block?,
       // how long does it block for?) depends on the configuration
       // settings above, specifically VMIN and VTIME
-      int n = read(serial_port, &read_buf, sizeof(read_buf));
-      memcpy(&temp, &read_buf, sizeof(temp));
-      joint_position_[i] = (double)temp;
-    }
+      int n = ::read(serial_port, &temp.array, 4);
+      if (n<=0){
 
-    void MerlinHardwareInterface::write(ros::Duration elapsed_time)
-    {
-      positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
-      unsigned char msg[] = {'W'};
-      write(serial_port, msg, sizeof(msg));
-
-      union
-      {
-        float val;
-        char array[4];
-      } conv;
-      for (int i = 0; i < num_joints_; i++)
-      {
-        conv.val = (float)joint_position_command_[i];
-        write(serial_port, conv.array, 4);
       }
+      joint_position_[i] = (double)temp.val;
+
     }
-  } // namespace merlin_hardware_interface
+  }
+
+  void MerlinHardwareInterface::write(ros::Duration elapsed_time)
+  {
+    //positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+    char msg[] = {'W'};
+    ::write(serial_port, msg, sizeof(msg));
+    
+    open_float conv;
+    
+    for (int i = 0; i < num_joints_; i++)
+    {
+      conv.val = (float)joint_position_command_[i];
+      ::write(serial_port, conv.array, 4);
+    }
+  }
+} // namespace merlin_hardware_interface
