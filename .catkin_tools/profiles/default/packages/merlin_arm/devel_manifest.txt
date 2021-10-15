@@ -1,5 +1,0 @@
-merlin_arm
-/home/rc/catkin_ws/devel/.private/merlin_arm/cmake.lock /home/rc/catkin_ws/devel/./cmake.lock
-/home/rc/catkin_ws/devel/.private/merlin_arm/share/merlin_arm/cmake/merlin_armConfig-version.cmake /home/rc/catkin_ws/devel/share/merlin_arm/cmake/merlin_armConfig-version.cmake
-/home/rc/catkin_ws/devel/.private/merlin_arm/share/merlin_arm/cmake/merlin_armConfig.cmake /home/rc/catkin_ws/devel/share/merlin_arm/cmake/merlin_armConfig.cmake
-/home/rc/catkin_ws/devel/.private/merlin_arm/lib/pkgconfig/merlin_arm.pc /home/rc/catkin_ws/devel/lib/pkgconfig/merlin_arm.pc

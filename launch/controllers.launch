@@ -9,12 +9,11 @@
 <node name="merlin_hardware_interface" pkg="merlin" type="merlin_hardware_interface_node" output="screen"/>
 
 <node name="controller_spawner" output="screen" pkg="controller_manager" respawn="false" type="spawner"
-  args="arm_controller joint_state_controller"/>
+  ns="merlin" args="arm_controller joint_state_controller"/>
 
 <!-- convert joint states to TF transforms for rviz, etc -->
 <node name="robot_state_publisher" output="screen" pkg="robot_state_publisher" respawn="false" type="robot_state_publisher">
-  <!-- <remap from="/joint_states" to="/merlin/joint_states"/> -->
-  <!-- TODO: Add robot to a namespace -->
+  <remap from="/joint_states" to="/merlin/joint_states"/>
 </node>
 <!-- TODO: Move all below to new files -->
  <include file="$(find merlin_arm_moveit_config)/launch/move_group.launch" >

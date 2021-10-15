@@ -3,18 +3,19 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <merlin_hardware_interface/merlin_hardware_interface.h>
-// #include <sstream>
+
 #include <unistd.h> // write(), read(), close()
 #include <stdio.h>
 #include <stdlib.h>
-//#include <ioctl.h>
+
 #include <fcntl.h>
 #include <termios.h>
 
-constexpr const char *const SERIAL_PORT_1 = "/dev/configACM0";
+constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
 const int BUFFER_SIZE = 4;
 
-union open_float {
+union open_float
+{
   float val = 0;
   char array[4];
 };
@@ -43,7 +44,7 @@ namespace merlin_hardware_interface
   void MerlinHardwareInterface::init_serial()
   {
 
-   /* Open the file descriptor in non-blocking mode */
+    /* Open the file descriptor in non-blocking mode */
     serial_port = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
 
     // Check for errors
@@ -51,49 +52,49 @@ namespace merlin_hardware_interface
     {
       printf("Error %i from open: %s\n", errno, strerror(errno));
     }
-   /* Set up the control structure */
- struct termios toptions;
- 
- /* Get currently set options for the tty */
- tcgetattr(serial_port, &toptions);
- 
-/* Set custom options */
- 
-/* 9600 baud */
- cfsetispeed(&toptions, B115200);
- cfsetospeed(&toptions, B115200);
- /* 8 bits, no parity, no stop bits */
- toptions.c_cflag &= ~PARENB;
- toptions.c_cflag &= ~CSTOPB;
- toptions.c_cflag &= ~CSIZE;
- toptions.c_cflag |= CS8;
- /* no hardware flow control */
- toptions.c_cflag &= ~CRTSCTS;
- /* enable receiver, ignore status lines */
- toptions.c_cflag |= CREAD | CLOCAL;
- /* disable input/output flow control, disable restart chars */
- toptions.c_iflag &= ~(IXON | IXOFF | IXANY);
- /* disable canonical input, disable echo,
+    /* Set up the control structure */
+    struct termios toptions;
+
+    /* Get currently set options for the tty */
+    tcgetattr(serial_port, &toptions);
+
+    /* Set custom options */
+
+    /* 9600 baud */
+    cfsetispeed(&toptions, B115200);
+    cfsetospeed(&toptions, B115200);
+    /* 8 bits, no parity, no stop bits */
+    toptions.c_cflag &= ~PARENB;
+    toptions.c_cflag &= ~CSTOPB;
+    toptions.c_cflag &= ~CSIZE;
+    toptions.c_cflag |= CS8;
+    /* no hardware flow control */
+    toptions.c_cflag &= ~CRTSCTS;
+    /* enable receiver, ignore status lines */
+    toptions.c_cflag |= CREAD | CLOCAL;
+    /* disable input/output flow control, disable restart chars */
+    toptions.c_iflag &= ~(IXON | IXOFF | IXANY);
+    /* disable canonical input, disable echo,
  disable visually erase chars,
  disable terminal-generated signals */
- toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
- /* disable output processing */
- toptions.c_oflag &= ~OPOST;
- 
-/* wait for 12 characters to come in before read returns */
-/* WARNING! THIS CAUSES THE read() TO BLOCK UNTIL ALL */
-/* CHARACTERS HAVE COME IN! */
- toptions.c_cc[VMIN] = 4;
- /* no minimum time to wait before read returns */
- toptions.c_cc[VTIME] = 10;
- 
-/* commit the options */
- tcsetattr(serial_port, TCSANOW, &toptions);
- 
-/* Wait for the Arduino to reset */
- usleep(1000*1000);
- /* Flush anything already in the serial buffer */
- tcflush(serial_port, TCIFLUSH);
+    toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    /* disable output processing */
+    toptions.c_oflag &= ~OPOST;
+
+    /* wait for 12 characters to come in before read returns */
+    /* WARNING! THIS CAUSES THE read() TO BLOCK UNTIL ALL */
+    /* CHARACTERS HAVE COME IN! */
+    toptions.c_cc[VMIN] = 4;
+    /* no minimum time to wait before read returns */
+    toptions.c_cc[VTIME] = 10;
+
+    /* commit the options */
+    tcsetattr(serial_port, TCSANOW, &toptions);
+
+    /* Wait for the Arduino to reset */
+    usleep(1000 * 1000);
+    /* Flush anything already in the serial buffer */
+    tcflush(serial_port, TCIFLUSH);
   }
   void MerlinHardwareInterface::init()
   {
@@ -157,11 +158,10 @@ namespace merlin_hardware_interface
       // how long does it block for?) depends on the configuration
       // settings above, specifically VMIN and VTIME
       int n = ::read(serial_port, &temp.array, 4);
-      if (n<=0){
-
+      if (n <= 0)
+      {
       }
       joint_position_[i] = (double)temp.val;
-
     }
   }
 
@@ -170,9 +170,9 @@ namespace merlin_hardware_interface
     //positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
     char msg[] = {'W'};
     ::write(serial_port, msg, sizeof(msg));
-    
+
     open_float conv;
-    
+
     for (int i = 0; i < num_joints_; i++)
     {
       conv.val = (float)joint_position_command_[i];

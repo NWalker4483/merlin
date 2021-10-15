@@ -1,6 +1,7 @@
 #include <merlin_hardware_interface/merlin_hardware_interface.h>
 #include <ros/callback_queue.h>
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "merlin_hardware_interface");
   ros::CallbackQueue ros_queue;
 
