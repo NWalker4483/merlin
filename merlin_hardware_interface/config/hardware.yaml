@@ -1,0 +1,10 @@
+merlin:
+  hardware_interface:
+      loop_hz: 10 # hz
+      joints:
+        - waist
+        - shoulder
+        - elbow
+        - wrist_rotation
+        - wrist_flex
+        - hand_roll

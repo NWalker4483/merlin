@@ -1,8 +1,9 @@
-# A ROS Package for simulating and controlling the *American Robot* Merlin Robotic Arm
+# A set of ROS Packages for simulating and controlling the *American Robot* Merlin Robotic Arm MR6500
 This package provides:
-*  URDF
-*  a hardware interface
-*  gazebo setup
+*  URDF Description
+*  Hardware Interface
+*  Gazebo Setup
+*  MoveIt Configuration
 
 !["Simulation Image"](assets/sim.png)
 

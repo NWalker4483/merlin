@@ -1,0 +1,6 @@
+<launch>
+
+  <include file="$(find merlin_description)/launch/gazebo.launch"/>
+  <include file="$(find merlin_hardware_interface)/launch/controllers.launch"/>
+  <include file="$(find merlin_moveit_config)/launch/move_group.launch"/>
+</launch>
