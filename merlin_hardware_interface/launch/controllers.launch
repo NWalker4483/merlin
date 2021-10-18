@@ -1,5 +1,6 @@
 <launch>
-<param command="$(find xacro)/xacro $(find merlin_description)/urdf/merlin_arm.xacro" name="robot_description"/>
+
+<param command="$(find xacro)/xacro $(find merlin_description)/urdf/merlin.xacro" name="robot_description"/>
 
 <!-- Load joint controller configurations from YAML file to parameter server -->
 <rosparam file="$(find merlin_hardware_interface)/config/hardware.yaml" command="load"/>
@@ -15,4 +16,5 @@
 <node name="robot_state_publisher" output="screen" pkg="robot_state_publisher" respawn="false" type="robot_state_publisher">
   <remap from="/joint_states" to="/merlin/joint_states"/>
 </node>
+
 </launch>
