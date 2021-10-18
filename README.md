@@ -1,4 +1,4 @@
-# A set of ROS Packages for simulating and controlling the *American Robot* Merlin Robotic Arm MR6500
+# A set of ROS Packages for simulating and controlling the *American Robot* Merlin MR6500 Robotic Arm 
 This package provides:
 *  URDF Description
 *  Hardware Interface
