@@ -14,7 +14,7 @@ At this point it's limitations
 ### Degrees of Freedom
 Right now we have control of the three major axes using 3 of the 12 V stepper drivers that I had on hand. These 3 axes are waist rotation, shoulder rotation and elbow rotation.
 ### Offline Programming
-Using ROS + MoveIt, it's possible to set goal states in the GUI by dragging a virtual arm or sending cartesian positions to the planner through something like a python script. The arm will then approach this target position while checking to see if it's going to hit itself. ```NOTE: The simulator is set up with all 6DOF despite only 3 working```
+Using ROS + MoveIt, it's possible to set goal states in the GUI by dragging a virtual arm or sending cartesian positions to the planner through something like a python script. The arm will then approach this target position while checking to see if it's going to hit itself. ```NOTE: The simulator is set up with all 6DOF despite only 3 enabled on the real machine```
 ## Current Limitations
 ### Degrees of Freedom
 Right now we have control of the three major axes using 3 of the 12 V stepper drivers that I had on hand. These 3 axes are waist rotation, shoulder rotation and elbow rotation.
