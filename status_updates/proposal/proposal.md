@@ -5,14 +5,14 @@ Robotic machining can be highly flexible because robots can be adjusted for a va
 
 <img src="assets/weld%20copy.jpeg" width="200">
 
-This arm is hefty and theres almost nothing you couldn't stick to it. So it's limitations are basically
-At this point it's limitations
+This arm is hefty and theres almost nothing you couldn't stick to it. 
 * Large Scale 3D Printing 
 * Photogrammetry
 * Automated 
   * Welding
   * Machining 
   * Painting
+  * Assembly
 ## Current Abilities
 
 <img src="assets/path.png" width="200">
