@@ -2,6 +2,9 @@
 
 Robotic machining can be highly flexible because robots can be adjusted for a variety of machining processes by changing the end-effectors or tools attached to the manipulator. As robotic machining systems have more DOF than machine tools, more complex parts can be machined. Since work on the Merlin MR6500 Arm in the shop has gone well its become a realistic capability if we want to pursue it. 
 ## Potential Uses:
+
+<img src="assets/weld%20copy.jpeg" width="200">
+
 This arm is hefty and theres almost nothing you couldn't stick to it. So it's limitations are basically
 At this point it's limitations
 * Large Scale 3D Printing 
@@ -11,6 +14,9 @@ At this point it's limitations
   * Machining 
   * Painting
 ## Current Abilities
+
+<img src="assets/path.png" width="200">
+
 ### Degrees of Freedom
 Right now we have control of the three major axes using 3 of the 12 V stepper drivers that I had on hand. These 3 axes are waist rotation, shoulder rotation and elbow rotation.
 ### Offline Programming
