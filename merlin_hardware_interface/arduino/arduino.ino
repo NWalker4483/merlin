@@ -1,52 +1,4 @@
-#define WAIST_PULSE_PIN 7
-#define WAIST_DIR_PIN 6
-#define WAIST_BRAKE_PIN 8
-#define WAIST_SPR 200
-#define WAIST_REDUCTION 48 // 1:x
-
-#define SHOULDER_PULSE_PIN 5
-#define SHOULDER_DIR_PIN 4
-#define SHOULDER_BRAKE_PIN 9
-#define SHOULDER_SPR 200
-#define SHOULDER_REDUCTION 48 // 1:x
-
-#define ELBOW_PULSE_PIN 3
-#define ELBOW_DIR_PIN 2
-#define ELBOW_BRAKE_PIN 10
-#define ELBOW_SPR 200
-#define ELBOW_REDUCTION 48 // 1:x
-
-#define AXIS_4_PULSE_PIN 11
-#define AXIS_4_DIR_PIN 12
-
-#define AXIS_5_PULSE_PIN 13
-#define AXIS_5_DIR_PIN 14
-
-#define AXIS_6_PULSE_PIN 15
-#define AXIS_6_DIR_PIN 16
-
-#define ONE_DEGREE 0.0175
-#define PI 3.14
-
-#define WAIST_RAD_PER_STEP (((2 * PI) / WAIST_SPR) / WAIST_REDUCTION)
-#define SHOULDER_RAD_PER_STEP (((2 * PI) / SHOULDER_SPR) / SHOULDER_REDUCTION)
-#define ELBOW_RAD_PER_STEP (((2 * PI) / ELBOW_SPR) / ELBOW_REDUCTION)
-#define WRIST_ROT_RAD_PER_STEP 0
-#define WRIST_FLEX_RAD_PER_STEP 0
-#define HAND_ROLL_RAD_PER_STEP 0
-
-union open_float
-{
-  char bytes[4];
-  float value = 0;
-};
-
-open_float waist, shoulder, elbow, wrist_roll, wrist_flex, hand_roll;
-open_float waist_target, shoulder_target, elbow_target, wrist_roll_target, wrist_flex_target, hand_roll_target;
-
-int pulse_pins[6] = {WAIST_PULSE_PIN, SHOULDER_PULSE_PIN, ELBOW_PULSE_PIN, AXIS_4_PULSE_PIN, AXIS_5_PULSE_PIN, AXIS_6_PULSE_PIN};
-int dir_pins[6] = {WAIST_DIR_PIN, SHOULDER_DIR_PIN, ELBOW_DIR_PIN, AXIS_4_DIR_PIN, AXIS_5_DIR_PIN, AXIS_6_DIR_PIN};
-bool wrist_first = false;
+#include "config.h"
 
 void setup_pins()
 {
@@ -74,6 +26,7 @@ void setup_pins()
 
 void load_saved_state()
 {
+  // TODO: Consider Making into a homing function 
   waist.value = 0;
   shoulder.value = 0;
   elbow.value = 0;
@@ -105,12 +58,12 @@ void setup()
 
 void update_arm_state()
 {
-  waist.value = ;
-  shoulder.value = ;
-  elbow.value = ;
-  wrist_roll.value = ;
-  wrist_flex.value = ;
-  hand_roll.value = ;
+  waist.value = 0;
+  shoulder.value = 0;
+  elbow.value = 0;
+  wrist_roll.value = 0;
+  wrist_flex.value = 0;
+  hand_roll.value = 0;
 }
 
 void update_arm_controls()
