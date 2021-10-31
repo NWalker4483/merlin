@@ -163,6 +163,7 @@ void update_arm_controls()
       }
     }
   }
+  
   wrist_first = !wrist_first; // Swap ordering each time step
   // Finished Update Wrist //
 

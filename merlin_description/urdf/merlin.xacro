@@ -4,13 +4,6 @@
 <xacro:include filename="$(find merlin_description)/urdf/materials.xacro" />
 <xacro:include filename="$(find merlin_description)/urdf/merlin.trans" />
 <xacro:include filename="$(find merlin_description)/urdf/merlin.gazebo" />
-
-<link name="world_link"/>
-<joint name="base_to_world" type="fixed">
-  <parent link="world_link"/>
-  <child link="base_link"/>
-</joint>
-
 <link name="base_link">
   <inertial>
     <origin rpy="0 0 0" xyz="0.0069422690555417796 1.1328659698873208e-16 0.15830248883091955"/>
@@ -34,9 +27,9 @@
 
 <link name="Waist_1">
   <inertial>
-    <origin rpy="0 0 0" xyz="0.042236804326939215 -3.6208159165569077e-10 0.3347694485082122"/>
-    <mass value="891.2154501387348"/>
-    <inertia ixx="37.366081" ixy="-0.0" ixz="6.613944" iyy="52.170529" iyz="-0.0" izz="30.694331"/>
+    <origin rpy="0 0 0" xyz="0.049382820138855435 -1.339727353549568e-09 0.2971243460783741"/>
+    <mass value="812.9704335382083"/>
+    <inertia ixx="28.634617" ixy="-1e-06" ixz="4.185208" iyy="41.522955" iyz="-0.0" izz="28.378178"/>
   </inertial>
   <visual>
     <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.762"/>
@@ -49,88 +42,46 @@
     <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.762"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Waist_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="Shoulder_Counter_Weight_1">
-  <inertial>
-    <origin rpy="0 0 0" xyz="1.638658695997039e-06 -0.13471745842372923 0.2124576649582044"/>
-    <mass value="163.9417401163658"/>
-    <inertia ixx="3.492257" ixy="1e-06" ixz="1.4e-05" iyy="4.256773" iyz="0.177081" izz="1.775182"/>
-  </inertial>
-  <visual>
-    <origin rpy="0 0 0" xyz="0.01126 0.17463 -1.19037"/>
-    <geometry>
-      <mesh filename="package://merlin_description/meshes/Shoulder_Counter_Weight_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="red-orange"/>
-  </visual>
-  <collision>
-    <origin rpy="0 0 0" xyz="0.01126 0.17463 -1.19037"/>
-    <geometry>
-      <mesh filename="package://merlin_description/meshes/Shoulder_Counter_Weight_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
 <link name="Shoulder_1">
   <inertial>
-    <origin rpy="0 0 0" xyz="4.668484247533772e-07 -0.08204199028652731 -0.21590006858905042"/>
-    <mass value="111.15438252619242"/>
-    <inertia ixx="3.463174" ixy="0.0" ixz="-0.0" iyy="3.544419" iyz="-0.0" izz="0.458811"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.19144610574590126 0.008004317446370424"/>
+    <mass value="261.9268819351425"/>
+    <inertia ixx="18.724068" ixy="-0.0" ixz="0.0" iyy="17.838364" iyz="-4.08305" izz="3.735585"/>
   </inertial>
   <visual>
-    <origin rpy="0 0 0" xyz="0.01126 0.403332 -1.19037"/>
+    <origin rpy="0 0 0" xyz="0.0 0.1778 -1.119907"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Shoulder_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="red-orange"/>
   </visual>
   <collision>
-    <origin rpy="0 0 0" xyz="0.01126 0.403332 -1.19037"/>
+    <origin rpy="0 0 0" xyz="0.0 0.1778 -1.119907"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Shoulder_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="Elbow_1">
-  <inertial>
-    <origin rpy="0 0 0" xyz="0.027842767336128563 0.07620048491817272 -8.583596211586553e-08"/>
-    <mass value="125.42249263338182"/>
-    <inertia ixx="0.541608" ixy="0.0" ixz="0.0" iyy="4.305167" iyz="0.0" izz="4.249064"/>
-  </inertial>
-  <visual>
-    <origin rpy="0 0 0" xyz="0.01126 0.403332 -0.75857"/>
-    <geometry>
-      <mesh filename="package://merlin_description/meshes/Elbow_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="red-orange"/>
-  </visual>
-  <collision>
-    <origin rpy="0 0 0" xyz="0.01126 0.403332 -0.75857"/>
-    <geometry>
-      <mesh filename="package://merlin_description/meshes/Elbow_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
 <link name="Lower_Head_1">
   <inertial>
-    <origin rpy="0 0 0" xyz="-0.037149268691422266 4.849181761135135e-07 -8.58359701094713e-08"/>
-    <mass value="2.3452928353268896"/>
-    <inertia ixx="0.007908" ixy="-0.0" ixz="0.0" iyy="0.008302" iyz="0.0" izz="0.004782"/>
+    <origin rpy="0 0 0" xyz="-0.0361575070816591 3.3861802251067274e-15 1.7643049632365404e-07"/>
+    <mass value="2.2131276746402757"/>
+    <inertia ixx="0.0067" ixy="-0.0" ixz="0.0" iyy="0.007083" iyz="0.0" izz="0.004151"/>
   </inertial>
   <visual>
-    <origin rpy="0 0 0" xyz="0.30336 0.327132 -0.75857"/>
+    <origin rpy="0 0 0" xyz="0.355626 0.3048 -0.721755"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Lower_Head_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin rpy="0 0 0" xyz="0.30336 0.327132 -0.75857"/>
+    <origin rpy="0 0 0" xyz="0.355626 0.3048 -0.721755"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Lower_Head_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -139,19 +90,19 @@
 
 <link name="Upper_Head_1">
   <inertial>
-    <origin rpy="0 0 0" xyz="-0.05114769265014063 4.849181650667944e-07 0.048955914164058534"/>
-    <mass value="3.5935679649522583"/>
-    <inertia ixx="0.006277" ixy="0.0" ixz="-0.0" iyy="0.006232" iyz="-0.0" izz="0.00493"/>
+    <origin rpy="0 0 0" xyz="-0.055606550532396326 3.3306690738754696e-16 0.04584517643050223"/>
+    <mass value="3.012798664762447"/>
+    <inertia ixx="0.004849" ixy="0.0" ixz="-0.0" iyy="0.006079" iyz="-0.0" izz="0.004733"/>
   </inertial>
   <visual>
-    <origin rpy="0 0 0" xyz="0.389755 0.327132 -0.709614"/>
+    <origin rpy="0 0 0" xyz="0.437922 0.3048 -0.67591"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Upper_Head_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin rpy="0 0 0" xyz="0.389755 0.327132 -0.709614"/>
+    <origin rpy="0 0 0" xyz="0.437922 0.3048 -0.67591"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Upper_Head_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -160,21 +111,42 @@
 
 <link name="Face_Plate_1">
   <inertial>
-    <origin rpy="0 0 0" xyz="-0.00393831587789073 4.849181727273333e-07 -8.58359836541922e-08"/>
-    <mass value="0.4796057544280874"/>
+    <origin rpy="0 0 0" xyz="-0.00393824468089865 0.0 1.764304806695094e-07"/>
+    <mass value="0.47960575442808734"/>
     <inertia ixx="0.000647" ixy="-0.0" ixz="0.0" iyy="0.000326" iyz="0.0" izz="0.000326"/>
   </inertial>
   <visual>
-    <origin rpy="0 0 0" xyz="0.470326 0.327132 -0.75857"/>
+    <origin rpy="0 0 0" xyz="0.526822 0.3048 -0.721755"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Face_Plate_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="black"/>
   </visual>
   <collision>
-    <origin rpy="0 0 0" xyz="0.470326 0.327132 -0.75857"/>
+    <origin rpy="0 0 0" xyz="0.526822 0.3048 -0.721755"/>
     <geometry>
       <mesh filename="package://merlin_description/meshes/Face_Plate_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Elbow_1">
+  <inertial>
+    <origin rpy="0 0 0" xyz="-0.024097643370389953 0.07620000000000005 0.043300176430502546"/>
+    <mass value="131.1743823904856"/>
+    <inertia ixx="0.57509" ixy="-0.0" ixz="0.0" iyy="4.777681" iyz="0.0" izz="4.709359"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.0 0.381 -0.678455"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/Elbow_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="red-orange"/>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.0 0.381 -0.678455"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/Elbow_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -188,45 +160,39 @@
 </joint>
 
 <joint name="shoulder" type="continuous">
-  <origin rpy="0 0 0" xyz="-0.01126 -0.17463 0.42837"/>
+  <origin rpy="0 0 0" xyz="-0.0 -0.1778 0.357907"/>
   <parent link="Waist_1"/>
-  <child link="Shoulder_Counter_Weight_1"/>
-  <axis xyz="0.0 1.0 0.0"/>
-</joint>
-
-<joint name="elbow_to_shoulder" type="fixed">
-  <origin rpy="0 0 0" xyz="0.0 -0.228702 0.0"/>
-  <parent link="Shoulder_Counter_Weight_1"/>
   <child link="Shoulder_1"/>
-</joint>
-
-<joint name="elbow" type="continuous">
-  <origin rpy="0 0 0" xyz="0.0 0.0 -0.4318"/>
-  <parent link="Shoulder_1"/>
-  <child link="Elbow_1"/>
   <axis xyz="0.0 -1.0 0.0"/>
 </joint>
 
 <joint name="wrist_rotation" type="continuous">
-  <origin rpy="0 0 0" xyz="-0.2921 0.0762 0.0"/>
+  <origin rpy="0 0 0" xyz="-0.355626 0.0762 0.0433"/>
   <parent link="Elbow_1"/>
   <child link="Lower_Head_1"/>
-  <axis xyz="-1.0 0.0 0.0"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
 </joint>
 
 <joint name="wrist_flex" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.086395 0.0 -0.048956"/>
+  <origin rpy="0 0 0" xyz="-0.082296 0.0 -0.045845"/>
   <parent link="Lower_Head_1"/>
   <child link="Upper_Head_1"/>
-  <axis xyz="0.0 0.0 1.0"/>
+  <axis xyz="-0.0 0.0 1.0"/>
   <limit effort="100" lower="-1.570796" upper="1.570796" velocity="100"/>
 </joint>
 
 <joint name="hand_roll" type="continuous">
-  <origin rpy="0 0 0" xyz="-0.080571 0.0 0.048956"/>
+  <origin rpy="0 0 0" xyz="-0.0889 0.0 0.045845"/>
   <parent link="Upper_Head_1"/>
   <child link="Face_Plate_1"/>
   <axis xyz="-1.0 0.0 0.0"/>
+</joint>
+
+<joint name="elbow" type="continuous">
+  <origin rpy="0 0 0" xyz="0.0 -0.2032 -0.441452"/>
+  <parent link="Shoulder_1"/>
+  <child link="Elbow_1"/>
+  <axis xyz="0.0 -1.0 0.0"/>
 </joint>
 
 </robot>
