@@ -36,7 +36,7 @@
     <geometry>
       <mesh filename="package://merlin_description/meshes/Waist_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="red-orange"/>
+    <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.762"/>
@@ -57,7 +57,7 @@
     <geometry>
       <mesh filename="package://merlin_description/meshes/Shoulder_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="red-orange"/>
+    <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.0 0.1778 -1.119907"/>
@@ -120,7 +120,7 @@
     <geometry>
       <mesh filename="package://merlin_description/meshes/Face_Plate_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="black"/>
+    <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.526796 0.3048 -0.678455"/>
@@ -141,7 +141,7 @@
     <geometry>
       <mesh filename="package://merlin_description/meshes/Elbow_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="red-orange"/>
+    <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="-0.0 0.381 -0.678455"/>
