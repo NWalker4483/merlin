@@ -33,7 +33,7 @@ bool update_arm_controls()
       j %= 5;
     forward_solve = !forward_solve;
     float step_distance = (360.0 / motor_sprs[j]) * motor_reductions[j][j];
-    if (abs(joint_states[j] - joint_targets[j]) >= abs(step_distance)
+    if (abs(joint_states[j] - joint_targets[j]) >= abs(step_distance))
     {
       int step_direction = (joint_states[j] > joint_targets[j]) ? -1 : 1;
 
