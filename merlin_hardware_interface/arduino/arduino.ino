@@ -1,186 +1,81 @@
 #include "config.h"
-
 void setup_pins()
 {
-  pinMode(WAIST_PULSE_PIN, OUTPUT);
-  pinMode(WAIST_DIR_PIN, OUTPUT);
-  pinMode(WAIST_BRAKE_PIN, OUTPUT);
-
-  pinMode(SHOULDER_PULSE_PIN, OUTPUT);
-  pinMode(SHOULDER_DIR_PIN, OUTPUT);
-  pinMode(SHOULDER_BRAKE_PIN, OUTPUT);
-
-  pinMode(ELBOW_PULSE_PIN, OUTPUT);
-  pinMode(ELBOW_DIR_PIN, OUTPUT);
-  pinMode(ELBOW_BRAKE_PIN, OUTPUT);
-
-  pinMode(AXIS_4_PULSE_PIN, OUTPUT);
-  pinMode(AXIS_4_DIR_PIN, OUTPUT);
-
-  pinMode(AXIS_5_PULSE_PIN, OUTPUT);
-  pinMode(AXIS_5_DIR_PIN, OUTPUT);
-
-  pinMode(AXIS_6_PULSE_PIN, OUTPUT);
-  pinMode(AXIS_6_DIR_PIN, OUTPUT);
+  for (int m = 0; m < 6; m++)
+  {
+    pinMode(pulse_pins[m], OUTPUT);
+    pinMode(dir_pins[m], OUTPUT);
+  }
 }
 
-void load_saved_state()
+void setDPS(float target_dps)
 {
-  // TODO: Consider Making into a homing function 
-  waist.value = 0;
-  shoulder.value = 0;
-  elbow.value = 0;
-  wrist_roll.value = 0;
-  wrist_flex.value = 0;
-  hand_roll.value = 0;
-}
-
-void set_brakes(bool lock)
-{
-  digitalWrite(WAIST_BRAKE_PIN, lock ? HIGH : LOW);
-  digitalWrite(SHOULDER_BRAKE_PIN, lock ? HIGH : LOW);
-  digitalWrite(ELBOW_BRAKE_PIN, lock ? HIGH : LOW);
-  delay(500);
+  // Calculate new min_joint_step_time array
 }
 
 void setup()
 {
-  Serial.begin(115200);
-
+  Serial.begin(9600);
   setup_pins();
-
-  load_saved_state();
-
-  set_brakes(false);
-
-  Serial.println("MERLIN MR6500 Controller Started");
+  //Serial.println("MERLIN MR6500 Controller Started");
 }
 
-void update_arm_state()
-{
-  waist.value = 0;
-  shoulder.value = 0;
-  elbow.value = 0;
-  wrist_roll.value = 0;
-  wrist_flex.value = 0;
-  hand_roll.value = 0;
-}
-
-void update_arm_controls()
+bool update_arm_controls()
 {
   int axis_steps[6] = {0, 0, 0, 0, 0, 0};
+  unsigned int curr_time = millis();
+  bool updated = false;
 
-  if (abs(waist.value - waist_target.value) > (ONE_DEGREE / 2))
+  // Update 6 Joints
+  for (int j = 0; j < 6; j++)
   {
-    axis_steps[0] = (waist.value > waist_target.value) ? -1 : 1; // Flipped Axis
+    if (!forward_solve)
+      j %= 5;
+    forward_solve = !forward_solve;
+    float step_distance = (360.0 / motor_sprs[j]) * motor_reductions[j][j];
+    if (abs(joint_states[j] - joint_targets[j]) >= abs(step_distance)
+    {
+      int step_direction = (joint_states[j] > joint_targets[j]) ? -1 : 1;
+
+      bool overflow = false;
+      overflow |= ((curr_time - joint_step_time[j]) < min_joint_step_time[j]);
+      for (int m = 0; m < 6; m++)
+      {
+        overflow |= abs(axis_steps[m] + (step_direction * joint_step_rules[m][j])) > 1;
+        overflow |= ((curr_time - motor_step_time[m]) < min_motor_pulse_time[m]);
+      }
+      if (overflow)
+        continue;
+      for (int m = 0; m < 6; m++)
+      {
+        axis_steps[m] += step_direction * joint_step_rules[m][j];
+      }
+      joint_states[j] += step_direction * step_distance;
+      joint_step_time[j] = curr_time;
+      updated = true;
+    }
   }
 
-  if (abs(shoulder.value - shoulder_target.value) > (ONE_DEGREE / 2))
+  // Step all motors at once
+  for (int m = 0; m < 6; m++)
   {
-    axis_steps[1] = (shoulder.value > shoulder_target.value) ? 1 : -1;
+    if (axis_steps[m] != 0)
+    {
+      digitalWrite(dir_pins[m], (axis_steps[m] > 0) ? LOW : HIGH);
+      digitalWrite(pulse_pins[m], HIGH);
+      motor_step_time[m] = curr_time;
+    }
   }
 
-  if (abs(elbow.value - elbow_target.value) > (ONE_DEGREE / 2))
+  for (int m = 0; m < 6; m++)
   {
-    axis_steps[2] = (elbow.value > elbow_target.value) ? 1 : -1;
-  }
-  // Start Update Wrist
-  if (wrist_first)
-  {
-    if (abs(wrist_roll.value - wrist_roll_target.value) > (ONE_DEGREE / 2))
+    if (curr_time - motor_step_time[m] >= min_motor_pulse_time[m])
     {
-      if (wrist_roll.value > wrist_roll_target.value)
-      {
-        axis_steps[3], axis_steps[4], axis_steps[5] = 1;
-      }
-      else
-      {
-        axis_steps[3], axis_steps[4], axis_steps[5] = -1;
-      }
-    }
-    if (abs(wrist_flex.value - wrist_flex_target.value) > (ONE_DEGREE / 2))
-    {
-      if ((wrist_flex.value > wrist_flex_target.value) and axis_steps[0] != 1)
-      {
-        axis_steps[4] += 1;
-        axis_steps[5] += 1;
-      }
-      else if ((wrist_flex.value < wrist_flex_target.value) and axis_steps[0] != -1)
-      {
-        axis_steps[4] -= 1;
-        axis_steps[5] -= 1;
-      }
-    }
-    if (abs(hand_roll.value - hand_roll_target.value) > (ONE_DEGREE / 2))
-    {
-      if ((hand_roll.value > hand_roll_target.value) and axis_steps[1] != 1)
-      {
-        axis_steps[5] += 1;
-      }
-      if ((hand_roll.value < hand_roll_target.value) and axis_steps[1] != -1)
-      {
-        axis_steps[5] -= 1;
-      }
+      digitalWrite(pulse_pins[m], LOW);
     }
   }
-  else
-  {
 
-    if (abs(hand_roll.value - hand_roll_target.value) > (ONE_DEGREE / 2))
-    {
-      if ((hand_roll.value > hand_roll_target.value) and axis_steps[1] != 1)
-      {
-        axis_steps[5] += 1;
-      }
-      if ((hand_roll.value < hand_roll_target.value) and axis_steps[1] != -1)
-      {
-        axis_steps[5] -= 1;
-      }
-    }
-    if (abs(wrist_flex.value - wrist_flex_target.value) > (ONE_DEGREE / 2))
-    {
-      if ((wrist_flex.value > wrist_flex_target.value) and axis_steps[0] != 1)
-      {
-        axis_steps[4] += 1;
-        axis_steps[5] += 1;
-      }
-      else if ((wrist_flex.value < wrist_flex_target.value) and axis_steps[0] != -1)
-      {
-        axis_steps[4] -= 1;
-        axis_steps[5] -= 1;
-      }
-    }
-
-    if (abs(wrist_roll.value - wrist_roll_target.value) > (ONE_DEGREE / 2))
-    {
-      if (wrist_roll.value > wrist_roll_target.value)
-      {
-        axis_steps[3], axis_steps[4], axis_steps[5] = 1;
-      }
-      else
-      {
-        axis_steps[3], axis_steps[4], axis_steps[5] = -1;
-      }
-    }
-  }
-  
-  wrist_first = !wrist_first; // Swap ordering each time step
-  // Finished Update Wrist //
-
-  // Minimize delay by stepping all motors at once
-  for (int i = 0; i < 6; i++)
-  {
-    if (axis_steps[i] != 0)
-    {
-      digitalWrite(dir_pins[i], (axis_steps[i] > 0) ? HIGH : LOW);
-      digitalWrite(pulse_pins[i], HIGH);
-    }
-  }
-  delay(4);
-  for (int i = 0; i < 6; i++)
-  {
-    digitalWrite(pulse_pins[i], LOW);
-  }
+  return updated;
 }
 
 void handle_commands()
@@ -190,38 +85,66 @@ void handle_commands()
     char cmd = Serial.read();
     if (cmd == 'R')
     {
-      Serial.write(waist.bytes, 4);
-      Serial.write(shoulder.bytes, 4);
-      Serial.write(elbow.bytes, 4);
-      Serial.write(wrist_roll.bytes, 4);
-      Serial.write(wrist_flex.bytes, 4);
-      Serial.write(hand_roll.bytes, 4);
+      open_float temp;
+      for (int i = 0; i < 6; i++)
+      {
+        temp.value = joint_states[i];
+        Serial.write(temp.bytes, 4);
+      }
     }
+
     if (cmd == 'W')
     {
-      Serial.readBytes(waist_target.bytes, 4);
-      Serial.readBytes(shoulder_target.bytes, 4);
-      Serial.readBytes(elbow_target.bytes, 4);
-      Serial.readBytes(wrist_roll.bytes, 4);
-      Serial.readBytes(wrist_flex.bytes, 4);
-      Serial.readBytes(hand_roll.bytes, 4);
+      open_float temp;
+      for (int i = 0; i < 6; i++)
+      {
+        Serial.readBytes(temp.bytes, 4);
+        joint_targets[i] = temp.value;
+      }
     }
-    if (cmd == 'D')
+
+    if (cmd == 'C')
     {
-      Serial.println(waist.value, 4);
-      Serial.println(shoulder.value, 4);
-      Serial.println(elbow.value, 4);
-      Serial.println(wrist_roll.value, 4);
-      Serial.println(wrist_flex.value, 4);
-      Serial.println(hand_roll.value, 4);
+      for (int i = 0; i < 6; i++)
+      {
+        Serial.print(joint_states[i]);
+        Serial.print(" ");
+      }
+      Serial.println("");
     }
+
+    if (cmd == 'M')
+    {
+      open_float temp;
+      for (int i = 0; i < 6; i++)
+      {
+        Serial.readBytes(temp.bytes, 4);
+        joint_targets[i] = temp.value;
+      }
+      bool done = false;
+      while (not done)
+      {
+        done = not update_arm_controls();
+      }
+      Serial.println("DONE");
+    }
+
+    if (cmd == 'H')
+    {
+      for (int j = 0; j < 6; j++)
+        joint_targets[j] = 0;
+      bool done = false;
+      while (not done)
+      {
+        done = not update_arm_controls();
+      }
+      Serial.println("DONE");
+    }
+
     if (cmd == 'T')
     {
-      wrist_roll_target.value = 1.5708;
-    }
-    if (cmd == 'Z')
-    {
-      wrist_roll_target.value = 0;
+      // joint_targets[1] = 20;
+      // joint_targets[0] = 20;
     }
   }
 }
@@ -230,5 +153,5 @@ void loop()
 {
   handle_commands();
   update_arm_controls();
-  update_arm_state();
+  // update_arm_state();
 }
