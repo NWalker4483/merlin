@@ -9,7 +9,7 @@
   <arg name="debug" default="false" />
 
   <!-- By default, we won't load or override the robot_description -->
-  <arg name="load_robot_description" default="false"/>
+  <arg name="load_robot_description" default="true"/>
 
   <!--
   By default, hide joint_state_publisher's GUI
@@ -19,7 +19,7 @@
   It also provides a GUI to move the simulated robot around "manually".
   This corresponds to moving around the real robot without the use of MoveIt.
   -->
-  <arg name="use_gui" default="false" />
+  <arg name="use_gui" default="true" />
 
   <!-- Gazebo specific options -->
   <arg name="gazebo_gui" default="true"/>
@@ -40,11 +40,11 @@
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" unless="$(arg use_gui)">
     <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
-    <rosparam param="source_list">[/joint_states]</rosparam>
+    <rosparam param="source_list">[merlin/joint_states]</rosparam>
   </node>
   <node name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" if="$(arg use_gui)">
     <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
-    <rosparam param="source_list">[/joint_states]</rosparam>
+    <rosparam param="source_list">[merlin/joint_states]</rosparam>
   </node>
 
   <!-- Given the published joint states, publish tf for the robot links -->

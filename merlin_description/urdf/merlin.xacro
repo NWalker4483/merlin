@@ -4,6 +4,9 @@
 <xacro:include filename="$(find merlin_description)/urdf/materials.xacro" />
 <xacro:include filename="$(find merlin_description)/urdf/merlin.trans" />
 <xacro:include filename="$(find merlin_description)/urdf/merlin.gazebo" />
+<link name="world_link">
+</link>
+
 <link name="base_link">
   <inertial>
     <origin rpy="0 0 0" xyz="0.0069422690555417796 1.1328659698873208e-16 0.15830248883091955"/>
@@ -194,5 +197,9 @@
   <child link="Elbow_1"/>
   <axis xyz="0.0 1.0 0.0"/>
 </joint>
+ <joint name="world" type="fixed">
+     <parent link="world_link"/>
+     <child link="base_link"/>
+   </joint>
 
 </robot>
