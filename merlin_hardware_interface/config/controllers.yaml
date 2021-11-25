@@ -5,7 +5,7 @@ merlin:
     publish_rate: 50
 
   arm_controller:
-    type: position_controllers/JointTrajectoryController
+    type: velocity_controllers/JointTrajectoryController
     joints:
       - waist
       - shoulder
@@ -13,5 +13,13 @@ merlin:
       - wrist_rotation
       - wrist_flex
       - hand_roll
+    gains: # Required because we're controlling a velocity interface
+      waist: {p: 1,  d: 0, i: 0, i_clamp: 0}
+      shoulder: {p: 1,  d: 0, i: 0, i_clamp: 0}
+      elbow: {p: 1,  d: 0, i: 0, i_clamp: 0}
+      wrist_rotation: {p: 1,  d: 0, i: 0, i_clamp: 0}
+      wrist_flex: {p: 1,  d: 0, i: 0, i_clamp: 0}
+      hand_roll: {p: 1,  d: 0, i: 0, i_clamp: 0}
+
     state_publish_rate:  25
     action_monitor_rate: 10

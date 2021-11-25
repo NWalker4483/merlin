@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <termios.h>
 
+#include <cstddef> // for NULL
+
 constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
 const int BUFFER_SIZE = 4;
 
@@ -118,7 +120,7 @@ namespace merlin_hardware_interface
     {
       // Create joint state interface
       JointStateHandle jointStateHandle(joint_names_[i], &joint_position_[i],
-                                        &joint_velocity_[i], &joint_effort_[i]);
+                                        &joint_velocity_[i], NULL);
       joint_state_interface_.registerHandle(jointStateHandle);
 
       // Create position joint interface
@@ -173,6 +175,37 @@ namespace merlin_hardware_interface
 
     open_float conv;
 
+//     #include <iostream>
+// #include <Eigen/Dense>
+ 
+// using namespace std;
+// using namespace Eigen;
+ 
+// int main()
+// {
+//    Matrix3f A;
+//    Vector3f b;
+//    A << 1,2,3,  4,5,6,  7,8,10;
+//    b << 3, 3, 4;
+//    cout << "Here is the matrix A:\n" << A << endl;
+//    cout << "Here is the vector b:\n" << b << endl;
+//    Vector3f x = A.colPivHouseholderQr().solve(b);
+//    cout << "The solution is:\n" << x << endl;
+// }
+
+// #include <Eigen/LU>
+// #include <iostream>
+
+// int main() {
+//   Eigen::Matrix3d A;
+//   A << 64, 256, 1024, 48, 256, 1280, 24, 192, 1280;
+//   Eigen::Vector3d B;
+//   B << -9.0, 0, 0;
+//   Eigen::Matrix3d A_inv = A.inverse();
+//   Eigen::Vector3d x = A_inv * B;
+
+//   std::cout << "solution x=\n" << x << "\n\nresidual A*x-B=\n" << A * x - B << '\n';
+// }
     for (int i = 0; i < num_joints_; i++)
     {
       conv.val = (float)joint_position_command_[i];
