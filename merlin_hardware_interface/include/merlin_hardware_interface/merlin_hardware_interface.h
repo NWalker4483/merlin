@@ -5,22 +5,23 @@
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
+#include <hardware_interface/posvel_command_interface.h>
 #include <hardware_interface/robot_hw.h>
+#include <iostream>
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
-#include <ros/ros.h>
 #include <merlin_hardware_interface/merlin_hardware.h>
-#include <iostream>
+#include <ros/ros.h>
 
 // C library headers
 #include <stdio.h>
 #include <string.h>
 
 // Linux headers
-#include <fcntl.h> // Contains file controls like O_RDWR
-#include <errno.h> // Error integer and strerror() function
+#include <errno.h>   // Error integer and strerror() function
+#include <fcntl.h>   // Contains file controls like O_RDWR
 #include <termios.h> // Contains POSIX terminal control definitions
 namespace serial {
 #include <unistd.h> // write(), read(), close()
@@ -54,6 +55,7 @@ protected:
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
+  PosVelJointInterface posvelJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   double loop_hz_;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
