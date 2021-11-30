@@ -148,6 +148,11 @@ namespace merlin_hardware_interface
     write(elapsed_time_);
   }
 
+  // void MerlinHardwareInterface::set_speeds()
+  // {
+
+  // }
+
   void MerlinHardwareInterface::read()
   {
     char msg[] = {'R'};

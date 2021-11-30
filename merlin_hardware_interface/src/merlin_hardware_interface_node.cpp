@@ -8,6 +8,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   nh.setCallbackQueue(&ros_queue);
   merlin_hardware_interface::MerlinHardwareInterface rhi(nh);
+  // ros::ServiceServer service = n.advertiseService("set_speeds", rhi.set_speeds);
 
   ros::MultiThreadedSpinner spinner(0);
   spinner.spin(&ros_queue);

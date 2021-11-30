@@ -23,6 +23,35 @@ display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path
                                                moveit_msgs.msg.DisplayTrajectory,
                                                queue_size=20)
 
+
+import socket
+
+host = ''        # Symbolic name meaning all available interfaces
+port = 12345     # Arbitrary non-privileged port
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((host, port))
+
+print(host , port)
+s.listen(1)
+conn, addr = s.accept()
+print('Connected by', addr)
+while True:
+
+    try:
+        data = conn.recv(1024)
+        if not data: break
+
+        print()
+        print("Client Says: "+data)
+        conn.sendall("Server Says:hi")
+
+    except socket.error:
+        print( "Error Occured." )
+        break
+
+conn.close()
+
+
 # We can get the name of the reference frame for this robot:
 planning_frame = group.get_planning_frame()
 print "============ Reference frame: %s" % planning_frame
@@ -97,3 +126,17 @@ group.clear_pose_targets()
 
 # # Note: We are just planning, not asking move_group to actually move the robot yet:
 # return plan, fraction
+
+# Well i did it a day before following a very good tutorial, cant find the link but here is the code
+
+# client.py
+# import socket
+
+# host = socket.gethostname()
+# port = 12345                   # The same port as used by the server
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.connect((host, port))
+# s.sendall(b'Hello, world')
+# data = s.recv(1024)
+# s.close()
+# print('Received', repr(data))

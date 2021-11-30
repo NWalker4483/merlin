@@ -3,27 +3,6 @@ import struct
 import numpy as np
 
 class MerlinRobot(RobotSerial):
-    def calculate_motor_speeds(target_dps):
-        assert(len(target_dps) == 6)
-
-        motor_sprs = np.array([200, 200, 200, 200, 200, 200]).T
-
-        target_dps = np.array(target_dps)
-
-        motor_reductions = np.array([[1/48., 0,     0,      0,          0,      0], 
-                                    [0,     1/48., 1/48.,  0,          0,      0], 
-                                    [0,     0,     1/48.,  0,          0,      0], 
-                                    [0,     0,     0,      1/24., -1/28.8,     1/24.], 
-                                    [0,     0,     0,      0,      1/28.8,     -1/48.], 
-                                    [0,     0,     0,      0,           0,     1/24.]])
-
-        degrees_per_step =  np.divide(motor_reductions.T, 360/motor_sprs)
-
-        steps_per_second = np.linalg.solve(degrees_per_step, target_dps)
-
-        delays = np.array(1000000/steps_per_second, dtype = int)
-
-        return delays
 
     def run_command(self, cmd, args):
         RoboDK.update_status('working')
