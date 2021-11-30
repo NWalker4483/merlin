@@ -197,6 +197,7 @@
   <child link="Elbow_1"/>
   <axis xyz="0.0 1.0 0.0"/>
 </joint>
+
  <joint name="world" type="fixed">
      <parent link="world_link"/>
      <child link="base_link"/>
