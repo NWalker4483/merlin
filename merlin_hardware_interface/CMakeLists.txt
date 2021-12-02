@@ -16,6 +16,11 @@ find_package(catkin REQUIRED COMPONENTS
   control_toolbox
   joint_limits_interface
 )
+SET( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" )
+IF( NOT EIGEN3_INCLUDE_DIR )
+    MESSAGE( FATAL_ERROR "Please point the environment variable EIGEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
+ENDIF()
+
 
 catkin_package(
   INCLUDE_DIRS 
@@ -37,6 +42,7 @@ catkin_package(
 
 include_directories(
   include/
+  "$ENV{EIGEN3_INCLUDE_DIR}"
   ${catkin_INCLUDE_DIRS})
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -48,11 +54,9 @@ add_library(merlin_hardware_interface src/merlin_hardware_interface.cpp)
 target_link_libraries(merlin_hardware_interface
 	${catkin_LIBRARIES})
 
-
 add_executable(merlin_hardware_interface_node src/merlin_hardware_interface_node.cpp)
 add_dependencies(merlin_hardware_interface_node merlin_hardware_interface)
 
 target_link_libraries(merlin_hardware_interface_node
   merlin_hardware_interface
-  
 	${catkin_LIBRARIES})

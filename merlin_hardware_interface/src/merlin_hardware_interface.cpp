@@ -163,17 +163,14 @@ void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
 
   open_float conv;
 
-  //    Matrix3f A;
-  //    Vector3f b;
-  //    A << 1,2,3,  4,5,6,  7,8,10;
-  //    b << 3, 3, 4;
-  //    cout << "Here is the matrix A:\n" << A << endl;
-  //    cout << "Here is the vector b:\n" << b << endl;
+  Eigen::Matrix<double, 1, 6> joint_position_holder(
+      joint_position_command_.data());
+
+  Eigen::Matrix<double, 1, 6> joint_velocity_holder(
+      joint_velocity_command_.data());
+
   //    Vector3f x = A.colPivHouseholderQr().solve(b);
   //    cout << "The solution is:\n" << x << endl;
-
-  // #include <Eigen/LU>
-  // #include <iostream>
 
   // int main() {
   //   Eigen::Matrix3d A;
