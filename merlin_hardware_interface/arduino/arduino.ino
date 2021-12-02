@@ -1,68 +1,116 @@
 #include "config.h"
 
-void setup() { Serial.begin(115200); }
+int a = 250;
+int b = 500;
 
-void handle_commands() {
-  if (Serial.available() > 0) {
+int cmd_buffer[6][2][6] ={{{a,a,a,a,a,a},{b,b,b,b,b,b}},
+{{-a,-a,-a,-a,-a,-a},{b,b,b,b,b,b}}} ;
+
+int cmd_idx = -1;
+
+bool debug = 0;
+int cmd_len = 0;
+
+void setup_steppers()
+{
+  stepper[0] = &stepper1;
+  stepper[1] = &stepper2;
+  stepper[2] = &stepper3;
+  stepper[3] = &stepper4;
+  stepper[4] = &stepper5;
+  stepper[5] = &stepper6;
+  for (int i = 0; i < 6; i++)
+    stepper[i]->setAcceleration(1000);
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  setup_steppers();
+}
+
+void handle_commands()
+{
+  if (Serial.available() > 2)
+  {
     int cmd = Serial.read();
     open_float temp;
-
-    if (cmd == 'R') {
+    if (cmd == 'R')
+    {
+      for (int j = 0; j < 6; j++)
+      {
+        Serial.write(stepper[j]->currentPosition());
+        Serial.write(1);
+      }
+    }
+    if (cmd == 'W')
+    {
       open_float temp;
-      for (int i = 0; i < 6; i++) {
-        temp.value = joint_states[i];
-        Serial.write(temp.bytes, 4);
+     cmd_len = Serial.read() - '0';
+    Serial.println(cmd_len);
+      // Read upto the next 96 bytes
+      for (int step_ = 0; step_ < cmd_len; step_++)
+      {
+        for (int mode = 0; mode < 2; mode++)
+        {
+          for (int motor = 0; motor < 6; motor++)
+          {
+            Serial.readBytes(temp.bytes, 4);
+            cmd_buffer[step_][mode][motor] = temp.value;
+          }
+        }
       }
-    }
-
-    if (cmd == 'W') {
-      for (int i = 0; i < 6; i++) {
-        Serial.readBytes(temp.bytes, 4);
-        joint_targets[i] = temp.value;
-      }
-    }
-
-    if (cmd == 'V') { // Accept degree per second values
-      for (int i = 0; i < 6; i++) {
-        Serial.readBytes(temp.bytes, 4);
-        // joint_targets[i] = temp.value;
-      }
-    }
-
-    if (cmd == 'C') { // TODO: Udpate Merlin RoboDK Driver to accept bytes from
-                      // 'R' command
-      for (int i = 0; i < 6; i++) {
-        Serial.print(joint_states[i]);
-        Serial.print(" ");
-      }
-      Serial.println("");
-    }
-
-    if (cmd == 'M') {
-      // todo calculate joint steps
-      for (int i = 0; i < 6; i++) {
-        Serial.readBytes(temp.bytes, 4);
-        joint_targets[i] = temp.value;
-      }
-      bool done = false;
-      while (not done) {
-        done = not update_arm_controls();
-      }
-      Serial.println("DONE");
-    }
-    if (cmd == 'T') {
-      for (int i = 0; i < 6; i++)
-        joint_targets[i] = 45;
-    }
-    if (cmd == 'Z') {
-      for (int i = 0; i < 6; i++)
-        joint_targets[i] = 0;
+      cmd_idx = -1;
     }
   }
 }
 
-void loop() {
+
+
+void update_arm_controls()
+{
+  if (cmd_len == 0) return;
+  for (int i = 0; i < 6; i++)
+    stepper[i]->run();
+    
+  bool done = true;
+  for (int i = 0; i < 6; i++)
+    if (stepper[i]->isRunning())
+      done = false;
+  
+  if (done)
+  {
+    cmd_idx = constrain(cmd_idx, -1, cmd_len) + 1;
+    if (cmd_idx >= cmd_len){
+      if (debug)
+      cmd_idx = 0;
+      else{
+      return;
+      }
+    }
+    //  
+    for (int i = 0; i < 6; i++)
+    {
+      stepper[i]->setMaxSpeed(cmd_buffer[cmd_idx][1][i]);
+      stepper[i]->setSpeed(cmd_buffer[cmd_idx][1][i]);
+      stepper[i]->move(cmd_buffer[cmd_idx][0][i]);
+    }
+  };
+ 
+}
+
+void loop()
+{
   handle_commands();
   update_arm_controls();
-  // update_arm_state();
+  //update_arm_state();
 }
+
+//void update_arm_state()
+//{
+//  // WARN: This is placeholder code for before the encoders are installed
+//  for (int i = 0; i < 6; i++){
+//  index_cnt[i].value = stepper[i]->currentPosition() / 200;
+//  pulse_cnt[i].value = stepper[i]->currentPosition() % 200;
+//  }
+//}
