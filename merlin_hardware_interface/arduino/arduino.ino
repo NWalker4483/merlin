@@ -11,6 +11,9 @@ int cmd_idx = -1;
 bool debug = 0;
 int cmd_len = 0;
 
+open_int index_cnt[6];
+open_int pulse_cnt[6];
+
 void setup_steppers()
 {
   stepper[0] = &stepper1;
@@ -22,16 +25,19 @@ void setup_steppers()
   for (int i = 0; i < 6; i++)
     stepper[i]->setAcceleration(1000);
 }
-
+void load_saved_state(){
+  }
 void setup()
 {
   Serial.begin(115200);
+  
   setup_steppers();
+  load_saved_state();
 }
 
 void handle_commands()
 {
-  if (Serial.available() > 2)
+  if (Serial.available() > 0)
   {
     int cmd = Serial.read();
     open_float temp;
@@ -39,15 +45,15 @@ void handle_commands()
     {
       for (int j = 0; j < 6; j++)
       {
-        Serial.write(stepper[j]->currentPosition());
-        Serial.write(1);
+        Serial.write(index_cnt[j].bytes, 4);
+        Serial.write(pulse_cnt[j].bytes, 4);
       }
     }
     if (cmd == 'W')
     {
       open_float temp;
+      while (not Serial.available());
      cmd_len = Serial.read() - '0';
-    Serial.println(cmd_len);
       // Read upto the next 96 bytes
       for (int step_ = 0; step_ < cmd_len; step_++)
       {
@@ -65,7 +71,14 @@ void handle_commands()
   }
 }
 
-
+void update_arm_state()
+{
+  // WARN: This is placeholder code for before the encoders are installed
+  for (int i = 0; i < 6; i++){
+  index_cnt[i].value = stepper[i]->currentPosition() / 200;
+  pulse_cnt[i].value = stepper[i]->currentPosition() % 200;
+  }
+}
 
 void update_arm_controls()
 {
@@ -103,14 +116,5 @@ void loop()
 {
   handle_commands();
   update_arm_controls();
-  //update_arm_state();
+  update_arm_state();
 }
-
-//void update_arm_state()
-//{
-//  // WARN: This is placeholder code for before the encoders are installed
-//  for (int i = 0; i < 6; i++){
-//  index_cnt[i].value = stepper[i]->currentPosition() / 200;
-//  pulse_cnt[i].value = stepper[i]->currentPosition() % 200;
-//  }
-//}

@@ -72,17 +72,17 @@ animation = \
  [0, 0, 0, 0, 15, 0], [0,0, 0, 0, -15, 0], 
  [0, 0, 0, 0, 0, 15], [0,0, 0, 0, 0, -15]]
 
-input("Start")
+input("Start:\n")
 for frame in animation:
     send_instructions(port,
     generate_step_instructions(frame, speeds))
-    sec = 5 
+    sec = 4 
 
-    # for _ in range(10):
-    #     time.sleep(1/10)
-    #     port.write('R'.encode())
-    #     pass
+    for _ in range(sec * 10):
+        time.sleep(1/10)
+        port.write('R'.encode())
+        print(port.read(12))
 
-    input()# time.sleep(1.5)
+    
 
 
