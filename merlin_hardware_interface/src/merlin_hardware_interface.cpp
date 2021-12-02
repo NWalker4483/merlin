@@ -55,30 +55,6 @@ void MerlinHardwareInterface::init_serial() {
   if (serial_port < 0) {
     printf("Error %i from open: %s\n", errno, strerror(errno));
   }
-<<<<<<< HEAD
-
-  // void MerlinHardwareInterface::set_speeds()
-  // {
-
-  // }
-
-  void MerlinHardwareInterface::read()
-  {
-    char msg[] = {'R'};
-    ::write(serial_port, msg, sizeof(msg));
-
-    for (int i = 0; i < num_joints_; i++)
-    {
-      open_float temp;
-      // Read bytes. The behaviour of read() (e.g. does it block?,
-      // how long does it block for?) depends on the configuration
-      // settings above, specifically VMIN and VTIME
-      int n = ::read(serial_port, &temp.array, 4);
-      if (n <= 0)
-      {
-      }
-      joint_position_[i] = (double)temp.val;
-=======
   /* Set up the control structure */
   struct termios toptions;
 
@@ -175,7 +151,6 @@ void MerlinHardwareInterface::read() {
     // settings above, specifically VMIN and VTIME
     int n = ::read(serial_port, &temp.array, 4);
     if (n <= 0) {
->>>>>>> 9bcf8f750890130385b8261021d815d41b3f88b9
     }
     joint_position_[i] = (double)temp.val;
   }

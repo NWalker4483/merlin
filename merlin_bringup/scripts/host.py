@@ -23,7 +23,6 @@ display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path
                                                moveit_msgs.msg.DisplayTrajectory,
                                                queue_size=20)
 
-
 import socket
 
 host = ''        # Symbolic name meaning all available interfaces
