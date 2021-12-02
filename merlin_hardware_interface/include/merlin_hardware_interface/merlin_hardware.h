@@ -39,16 +39,15 @@ protected:
   std::vector<int> joint_types_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
+  std::vector<double> joint_effort_;
 
-  Eigen::Matrix<float, 1, 6> motor_spr{200, 200, 200, 200, 200, 200};
-  Eigen::Matrix<float, 6, 6> motor_reductions{
-      {1. / 48., 0, 0, 0, 0, 0},
-      {0, 1. / 48., 1. / 48., 0, 0, 0},
-      {0, 0, 1. / 48., 0, 0, 0},
-      {0, 0, 0, 1. / 24., -1. / 28.8, 1. / 24.},
-      {0, 0, 0, 0, 1. / 28.8, -1. / 48.},
-      {0, 0, 0, 0, 0, 1. / 24.},
-  };
+  Eigen::Matrix<float, 1, 6> motor_spr;
+  Eigen::Matrix<float, 6, 6> motor_reductions;
+  Eigen::Matrix<float, 6, 6> degrees_per_step;
+  Eigen::Matrix<float, 6, 6> degrees_per_step_inv;
+
+  
+  std::vector<double> last_position_command_;
 
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;

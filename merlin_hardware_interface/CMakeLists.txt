@@ -42,6 +42,7 @@ catkin_package(
 
 include_directories(
   include/
+  /usr/include/
   "$ENV{EIGEN3_INCLUDE_DIR}"
   ${catkin_INCLUDE_DIRS})
 
