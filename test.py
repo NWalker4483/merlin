@@ -13,8 +13,7 @@ motor_reductions = np.array([[1/48., 0,     0,      0,          0,        0],
 motor_sprs = 200
 
 degrees_per_step = (360. / motor_sprs) * motor_reductions 
-
-port = serial.Serial("/dev/cu.usbmodem14201", 112500)
+# port = serial.Serial("/dev/cu.usbmodem14201", 112500)
 time.sleep(1.5)
 
 def generate_step_instructions(delta_theta, dps=[9, 9, 9, 9, 9, 9]):
@@ -38,12 +37,12 @@ def generate_step_instructions(delta_theta, dps=[9, 9, 9, 9, 9, 9]):
         if min_travel_time == np.inf:
             break
     
-        steps_per_second = np.linalg.solve(degrees_per_step.T, dps)
+        steps_per_second = np.linalg.inv(degrees_per_step.T) @ dps.T
         assert(np.allclose(np.dot(degrees_per_step.T, steps_per_second), dps))
         # print("\n", steps_per_second, "\n")
         # Compute which Joint to a complete first and then re-calculate motor speeds
         steps_to_take = min_travel_time * steps_per_second
-        steps_to_take = steps_to_take.astype(int)
+
         sub_delta_theta = np.dot(steps_to_take, degrees_per_step)
 
         delta_theta = delta_theta - sub_delta_theta
@@ -74,14 +73,15 @@ animation = \
 
 input("Start:\n")
 for frame in animation:
-    send_instructions(port,
-    generate_step_instructions(frame, speeds))
-    sec = 4 
+    # send_instructions(port,
+    print(generate_step_instructions(frame, speeds))
+    sec = 5 
+    input()
 
-    for _ in range(sec * 10):
-        time.sleep(1/10)
-        port.write('R'.encode())
-        print(port.read(12))
+    # for _ in range(sec * 10):
+    #     time.sleep(1/10)
+    #     port.write('R'.encode())
+    #     port.read(12)
 
     
 

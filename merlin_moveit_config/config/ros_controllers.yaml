@@ -2,10 +2,12 @@
 moveit_sim_hw_interface:
   joint_model_group: arm
   joint_model_group_pose: rest
+  
 # Settings for ros_control_boilerplate control loop
 generic_hw_control_loop:
   loop_hz: 300
   cycle_time_error_threshold: 0.01
+
 # Settings for ros_control hardware interface
 hardware_interface:
   joints:
@@ -16,54 +18,3 @@ hardware_interface:
     - wrist_flex
     - hand_roll
   sim_control_mode: 0  # 0: position, 1: velocity
-# Publish all joint states
-# sudo apt-get install ros*controller*
-merlin:
-  # Publish all joint states -----------------------------------
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 50
-
-  arm_controller:
-    type: pos_vel_controllers/JointTrajectoryController
-    joints:
-      - waist
-      - shoulder
-      - elbow
-      - wrist_rotation
-      - wrist_flex
-      - hand_roll
-    # TODO: Read Up on these 
-    constraints:
-      # goal_time: 0.6
-      stopped_velocity_tolerance: 0.5
-      waist: {trajectory: 0.3, goal: 0.1}
-      shoulder: {trajectory: 0.75, goal: 0.2}
-      elbow: {trajectory: 0.75, goal: 0.2}
-      wrist_rotation: {trajectory: 0.3, goal: 0.1}
-      wrist_flex: {trajectory: 0.3, goal: 0.1}
-      hand_roll: {trajectory: 0.3, goal: 0.1}
-
-    gains: # Required because we're controlling a velocity interface
-      waist:          {p: 1,  d: 0, i: 0, i_clamp: 1}
-      shoulder:       {p: 1,  d: 0, i: 0, i_clamp: 1}
-      elbow:          {p: 1,  d: 0, i: 0, i_clamp: 1}
-      wrist_rotation: {p: 1,  d: 0, i: 0, i_clamp: 1}
-      wrist_flex:     {p: 1,  d: 0, i: 0, i_clamp: 1}
-      hand_roll:      {p: 1,  d: 0, i: 0, i_clamp: 1}
-
-    state_publish_rate:  25
-    action_monitor_rate: 10
-
-controller_list:
-  - name: merlin/arm_controller
-    action_ns: follow_joint_trajectory
-    default: True
-    type: FollowJointTrajectory
-    joints:
-      - waist
-      - shoulder
-      - elbow
-      - wrist_rotation
-      - wrist_flex
-      - hand_roll

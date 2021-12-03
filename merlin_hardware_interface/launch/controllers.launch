@@ -10,8 +10,7 @@
 <node name="merlin_hw" pkg="merlin_hardware_interface" type="merlin_hardware_interface_node" output="screen"/>
 
 <node name="controller_spawner" output="screen" pkg="controller_manager" respawn="false" type="spawner"
-  args="--namespace=/merlin 
-  arm_controller joint_state_controller"/>
+  ns="/merlin" args="arm_controller joint_state_controller"/>
 
 <!-- convert joint states to TF transforms for rviz, etc -->
 <node name="robot_state_publisher" output="screen" pkg="robot_state_publisher" respawn="false" type="robot_state_publisher">

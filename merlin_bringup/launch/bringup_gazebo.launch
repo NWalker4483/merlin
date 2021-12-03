@@ -2,13 +2,6 @@
 <!-- TODO: launch fake controllers -->
   <include file="$(find merlin_description)/launch/gazebo.launch"/>
   <include file="$(find merlin_hardware_interface)/launch/controllers.launch"/>
-  <include file="$(find merlin_moveit_config)/launch/move_group.launch"/>
-
-    <!-- launch the gazebo simulator and spawn the robot -->
-  <!-- <include file="$(find merlin_moveit_config)/launch/gazebo.launch" >
-    <arg name="paused" value="$(arg paused)"/>
-    <arg name="gazebo_gui" value="$(arg gazebo_gui)"/>
-    <arg name="urdf_path" value="$(arg urdf_path)"/>
-  </include> -->
-
+  <include file="$(find merlin_moveit_config)/launch/move_group.launch">
+  </include>
 </launch>
