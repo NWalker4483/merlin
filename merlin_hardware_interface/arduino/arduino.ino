@@ -3,8 +3,8 @@
 int a = 250;
 int b = 500;
 
-int cmd_buffer[6][2][6] ={{{a,a,a,a,a,a},{b,b,b,b,b,b}},
-{{-a,-a,-a,-a,-a,-a},{b,b,b,b,b,b}}} ;
+int cmd_buffer[6][2][6] = {{{a, a, a, a, a, a}, {b, b, b, b, b, b}},
+                           {{-a, -a, -a, -a, -a, -a}, {b, b, b, b, b, b}}};
 
 int cmd_idx = -1;
 
@@ -14,8 +14,7 @@ int cmd_len = 0;
 open_int index_cnt[6];
 open_int pulse_cnt[6];
 
-void setup_steppers()
-{
+void setup_steppers() {
   stepper[0] = &stepper1;
   stepper[1] = &stepper2;
   stepper[2] = &stepper3;
@@ -25,42 +24,42 @@ void setup_steppers()
   for (int i = 0; i < 6; i++)
     stepper[i]->setAcceleration(1000);
 }
-void load_saved_state(){
-  }
-void setup()
-{
+
+void load_saved_state() {}
+
+void setup() {
   Serial.begin(115200);
-  
+
   setup_steppers();
   load_saved_state();
 }
 
-void handle_commands()
-{
-  if (Serial.available() > 0)
-  {
+void handle_commands() {
+  if (Serial.available() > 0) {
     int cmd = Serial.read();
     open_float temp;
-    if (cmd == 'R')
-    {
-      for (int j = 0; j < 6; j++)
-      {
+    if (cmd == 'R') {
+      for (int j = 0; j < 6; j++) {
         Serial.write(index_cnt[j].bytes, 4);
         Serial.write(pulse_cnt[j].bytes, 4);
       }
     }
-    if (cmd == 'W')
-    {
-      open_float temp;
-      while (not Serial.available());
-     cmd_len = Serial.read() - '0';
+
+    if (cmd == 'W') {
+      for (int motor = 0; motor < 6; motor++) {
+        Serial.readBytes(temp.bytes, 4);
+        stepper[motor]->setSpeed(temp.value);
+      }
+    }
+
+    if (cmd == 'T') {
+      while (not Serial.available())
+        ;
+      cmd_len = Serial.read() - '0';
       // Read upto the next 96 bytes
-      for (int step_ = 0; step_ < cmd_len; step_++)
-      {
-        for (int mode = 0; mode < 2; mode++)
-        {
-          for (int motor = 0; motor < 6; motor++)
-          {
+      for (int step_ = 0; step_ < cmd_len; step_++) {
+        for (int mode = 0; mode < 2; mode++) {
+          for (int motor = 0; motor < 6; motor++) {
             Serial.readBytes(temp.bytes, 4);
             cmd_buffer[step_][mode][motor] = temp.value;
           }
@@ -71,50 +70,47 @@ void handle_commands()
   }
 }
 
-void update_arm_state()
-{
+void update_arm_state() {
   // WARN: This is placeholder code for before the encoders are installed
-  for (int i = 0; i < 6; i++){
-  index_cnt[i].value = stepper[i]->currentPosition() / 200;
-  pulse_cnt[i].value = stepper[i]->currentPosition() % 200;
+  for (int i = 0; i < 6; i++) {
+    index_cnt[i].value = stepper[i]->currentPosition() / 200;
+    pulse_cnt[i].value = stepper[i]->currentPosition() % 200;
   }
 }
 
-void update_arm_controls()
-{
-  if (cmd_len == 0) return;
+void update_arm_controls() {
+  if (cmd_len == 0)
+    return;
   for (int i = 0; i < 6; i++)
     stepper[i]->run();
-    
+
   bool done = true;
   for (int i = 0; i < 6; i++)
     if (stepper[i]->isRunning())
       done = false;
-  
-  if (done)
-  {
+
+  if (done) {
     cmd_idx = constrain(cmd_idx, -1, cmd_len) + 1;
-    if (cmd_idx >= cmd_len){
+    if (cmd_idx >= cmd_len) {
       if (debug)
-      cmd_idx = 0;
-      else{
-      return;
+        cmd_idx = 0;
+      else {
+        return;
       }
     }
-    //  
-    for (int i = 0; i < 6; i++)
-    {
+    //
+    for (int i = 0; i < 6; i++) {
       stepper[i]->setMaxSpeed(cmd_buffer[cmd_idx][1][i]);
       stepper[i]->setSpeed(cmd_buffer[cmd_idx][1][i]);
       stepper[i]->move(cmd_buffer[cmd_idx][0][i]);
     }
   };
- 
 }
 
-void loop()
-{
+void loop() {
   handle_commands();
-  update_arm_controls();
+  for (int i = 0; i < 6; i++)
+    stepper[i]->runSpeed();
+  //   update_arm_controls();
   update_arm_state();
 }

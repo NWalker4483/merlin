@@ -6,6 +6,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
+
 #include <iostream>
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_interface.h>
@@ -26,6 +27,8 @@ protected:
   // Interfaces
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::PositionJointInterface position_joint_interface_;
+  hardware_interface::VelocityJointInterface velocity_joint_interface_;
+  hardware_interface::PosVelAccJointInterface posvelaccJointInterface;
 
   joint_limits_interface::PositionJointSaturationInterface
       position_joint_saturation_interface_;
@@ -39,6 +42,7 @@ protected:
   std::vector<int> joint_types_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
+  std::vector<double> joint_accel_;
   std::vector<double> joint_effort_;
 
   Eigen::Matrix<float, 1, 6> motor_spr;
@@ -46,7 +50,6 @@ protected:
   Eigen::Matrix<float, 6, 6> degrees_per_step;
   Eigen::Matrix<float, 6, 6> degrees_per_step_inv;
 
-  
   std::vector<double> last_position_command_;
 
   std::vector<double> joint_position_command_;

@@ -6,6 +6,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/posvel_command_interface.h>
+#include <hardware_interface/posvelacc_command_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <iostream>
 #include <joint_limits_interface/joint_limits.h>
@@ -14,7 +15,6 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <merlin_hardware_interface/merlin_hardware.h>
 #include <ros/ros.h>
-
 // C library headers
 #include <stdio.h>
 #include <string.h>
@@ -26,8 +26,6 @@
 namespace serial {
 #include <unistd.h> // write(), read(), close()
 }
-
-
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -57,7 +55,7 @@ protected:
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
-  PosVelJointInterface posvelJointInterface;
+  PosVelAccJointInterface posvelaccJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   double loop_hz_;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
