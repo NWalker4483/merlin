@@ -3,7 +3,6 @@
 
 <gazebo>
   <plugin filename="libgazebo_ros_control.so" name="control">     
-  <robotNamespace>/merlin</robotNamespace>
   </plugin>
 </gazebo>
 <gazebo reference="base_link">
