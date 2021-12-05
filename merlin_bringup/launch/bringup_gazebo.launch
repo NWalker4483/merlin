@@ -5,3 +5,5 @@
   <include file="$(find merlin_moveit_config)/launch/move_group.launch">
   </include>
 </launch>
+
+2a38847b0de5a06ba7e183f6334e98c5ca510d95

@@ -36,7 +36,7 @@ def generate_step_instructions(delta_theta, dps=[9, 9, 9, 9, 9, 9]):
 
         if min_travel_time == np.inf:
             break
-    
+        
         steps_per_second = np.linalg.inv(degrees_per_step.T) @ dps.T
         assert(np.allclose(np.dot(degrees_per_step.T, steps_per_second), dps))
         # print("\n", steps_per_second, "\n")
