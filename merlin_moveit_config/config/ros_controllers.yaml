@@ -1,27 +1,52 @@
 # Simulation settings for using moveit_sim_controllers
-# moveit_sim_hw_interface:
-#   joint_model_group: arm
-#   joint_model_group_pose: rest
-  
-# # Settings for ros_control_boilerplate control loop
-# generic_hw_control_loop:
-#   loop_hz: 300
-#   cycle_time_error_threshold: 0.01
+moveit_sim_hw_interface:
+  joint_model_group: arm
+  joint_model_group_pose: rest
+# Settings for ros_control_boilerplate control loop
+generic_hw_control_loop:
+  loop_hz: 300
+  cycle_time_error_threshold: 0.01
 
 # Settings for ros_control hardware interface
-# hardware_interface:
-#   joints:
-#     - waist
-#     - shoulder
-#     - elbow
-#     - wrist_rotation
-#     - wrist_flex
-#     - hand_roll
-#   sim_control_mode: 0  # 0: position, 1: velocity
+hardware_interface:
+  joints:
+    - waist
+    - shoulder
+    - elbow
+    - wrist_rotation
+    - wrist_flex
+    - hand_roll
+  sim_control_mode: 1  # 0: position, 1: velocity
   
+# Publish all joint states
+# Creates the /joint_states topic necessary in ROS
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# Use the config in merlin_description later
+arm_controller:
+  type: velocity_controllers/JointTrajectoryController 
+  joints:
+    - waist
+    - shoulder
+    - elbow
+    - wrist_rotation
+    - wrist_flex
+    - hand_roll
+  state_publish_rate:  25
+  action_monitor_rate: 10
+  gains:
+    waist:          {p: 1,  d: 0, i: 0, i_clamp: 1}
+    shoulder:       {p: 1,  d: 0, i: 0, i_clamp: 1}
+    elbow:          {p: 1,  d: 0, i: 0, i_clamp: 1}
+    wrist_rotation: {p: 1,  d: 0, i: 0, i_clamp: 1}
+    wrist_flex:     {p: 1,  d: 0, i: 0, i_clamp: 1}
+    hand_roll:      {p: 1,  d: 0, i: 0, i_clamp: 1}
 controller_list:
-  - name: merlin/arm_controller
+  - name: arm_controller
     action_ns: follow_joint_trajectory
+    default: True
     type: FollowJointTrajectory
     joints:
       - waist

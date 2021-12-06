@@ -10,11 +10,17 @@
 <node name="merlin_hwi_node" pkg="merlin_hardware_interface" type="merlin_hardware_interface_node" output="screen"/>
 
 <node name="controller_spawner" output="screen" pkg="controller_manager" respawn="false" type="spawner"
-  args="merlin/arm_controller merlin/joint_state_controller"/>
+  args="arm_controller joint_state_controller"/>
 
 <!-- convert joint states to TF transforms for rviz, etc -->
 <node name="robot_state_publisher" output="screen" pkg="robot_state_publisher" respawn="false" type="robot_state_publisher">
-  <remap from="/joint_states" to="merlin/joint_states"/>
+  <!-- <remap from="/joint_states" to="merlin/joint_states"/> -->
 </node>
+
+<!-- TODO: Move all below to new files -->
+<include file="$(find merlin_moveit_config)/launch/move_group.launch" >
+</include>
+
+<node name="rviz" pkg="rviz" required="true" type="rviz"/>
 
 </launch>
