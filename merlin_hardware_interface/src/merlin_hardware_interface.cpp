@@ -129,22 +129,17 @@ void MerlinHardwareInterface::init() {
                                       &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(jointStateHandle);
 
-    // PosVelAccJointHandle jointPosVelAccHandle(
-    //     jointStateHandle, &joint_position_command_[i],
-    //     &joint_velocity_command_[i], &joint_accel_command[i]);
-
     // connect and register the joint position interface
-    JointHandle pos_handle_a(jointStateHandle, &joint_velocity_command_[i]);
+    JointHandle velocity_joint_handle(jointStateHandle, &joint_velocity_command_[i]);
 
-    velocity_joint_interface_.registerHandle(pos_handle_a);
-    // posvelaccJointInterface.registerHandle(jointPosVelAccHandle);
+    velocity_joint_interface_.registerHandle(velocity_joint_handle);
 
+    // TODO: Enforce joint limits
     JointLimits limits;
     getJointLimits(joint_names_[i], nh_, limits);
   };
 
   registerInterface(&joint_state_interface_);
-  // registerInterface(&posvelaccJointInterface);
   registerInterface(&velocity_joint_interface_);
 }
 
@@ -156,9 +151,14 @@ void MerlinHardwareInterface::update(const ros::TimerEvent &e) {
 }
 
 void MerlinHardwareInterface::read() {
-  char msg[] = {'R'};
-  // ::write(serial_port, msg, sizeof(msg));
+  float ppr = 200; // NOTE: Only use for when using stepper postion from accelstepper
+  Eigen::Matrix<float, 6, 1> index_cnt;
+  Eigen::Matrix<float, 6, 1> pulse_cnt;
+  Eigen::Matrix<float, 6, 1> rev_cnt;
 
+  char msg[] = {'R'};
+  ::write(serial_port, msg, sizeof(msg));
+  
   for (int i = 0; i < num_joints_; i++) {
     open_float index;
     open_float pulses;
@@ -166,81 +166,46 @@ void MerlinHardwareInterface::read() {
     // Read bytes. The behaviour of read() (e.g. does it block?,
     // how long does it block for?) depends on the configuration
     // settings above, specifically VMIN and VTIME
-
-    // int a = ::read(serial_port, &index.array, 4);
-    // int b = ::read(serial_port, &pulses.array, 4);
-
-    joint_position_[i] = 0; // (double)temp.val;
+   
+    int a = ::read(serial_port, &index.array, 4);
+    int b = ::read(serial_port, &pulses.array, 4);
+    index_cnt.row(i).col(0) << index.val;
+    pulse_cnt.row(i).col(0) << pulses.val;
   }
+  // Revs to Pulses
+    index_cnt *= ppr;
+    // Total Pulses
+    pulse_cnt += index_cnt;
+    // Total Revs
+    rev_cnt = pulse_cnt / ppr;
+    // Total Joint Revs
+    rev_cnt = motor_reductions * rev_cnt;
+    // Total Joint Travel from Zero Position in Rad 
+    rev_cnt *= 6.283;
+for (int i =0; i<6;i++){
+
+joint_position_[i] = rev_cnt.coeff(i,0);
+}
 }
 
 void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
-
-  if (last_position_command_ != joint_position_command_) {
-    last_position_command_ = joint_position_command_;
-  } else {
-    return;
-  }
   char msg[] = {'W'};
-  // ::write(serial_port, msg, sizeof(msg));
-
-  open_float step_cmd_holder[6][2][6];
-  int cmd_len = 0;
-
-  Eigen::Matrix<float, 6, 1> joint_dtheta_holder;
-
-  for (int joint = 0; joint < 6; joint++) {
-    joint_dtheta_holder.row(joint)
-        << joint_position_[joint] - joint_position_command_[joint];
-  }
+  ::write(serial_port, msg, sizeof(msg));
 
   Eigen::Matrix<float, 6, 1> joint_velocity_holder;
 
   for (int joint = 0; joint < 6; joint++) {
     joint_velocity_holder.row(joint) << joint_velocity_command_[joint];
   }
-  for (int stage = 0; stage < 6; stage++) {
-    float min_travel_time = 10000000;
-    for (int joint = 0; joint < 6; joint++) {
-      if (joint_dtheta_holder.coeff(joint, 0) != 0 &&
-          joint_velocity_holder.coeff(joint, 0) != 0) {
-        float travel_time = joint_dtheta_holder.coeff(joint, 0) /
-                            joint_velocity_holder.coeff(joint, 0);
-        if (travel_time < min_travel_time)
-          min_travel_time = travel_time;
-      } else {
-        joint_velocity_holder.row(joint).col(0) << 0;
-      }
-    }
-    if (min_travel_time == 10000000)
-      break;
 
-    Eigen::Matrix<float, 6, 1> steps_per_second =
-        degrees_per_step_inv * joint_velocity_holder;
-    Eigen::Matrix<float, 6, 1> steps_to_take =
-        steps_per_second * min_travel_time;
-    Eigen::Matrix<float, 6, 1> sub_delta_theta =
-        steps_to_take.transpose() * degrees_per_step;
-
-    joint_dtheta_holder -= sub_delta_theta;
-    // Store Results
+  Eigen::Matrix<float, 6, 1> steps_per_second =
+      degrees_per_step_inv * joint_velocity_holder;
+      
+    open_float temp;
     for (int i = 0; i < 6; i++) {
-      step_cmd_holder[cmd_len][0][i].val = steps_to_take.coeff(i, 0);
-      step_cmd_holder[cmd_len][1][i].val = steps_per_second.coeff(i, 0);
+      temp.val = steps_per_second.coeff(i, 0);
+      ::write(serial_port, temp.array, 4); 
     }
-    cmd_len += 1;
   }
-  // std::cout << "solution x=\n" << x << "\n\nresidual A*x-B=\n" << A * x - B
-  // << '\n';
-  char msg22[] = {'1'};
-  // ::write(serial_port, msg22, sizeof(msg22));
 
-  for (int stage = 0; stage < cmd_len; stage++) {
-    for (int mode = 0; mode < 2; mode++) {
-      for (int joint = 0; joint < 6; joint++) {
-        // ::write(serial_port, step_cmd_holder[stage][mode][joint].array, 4);
-      }
-    }
-  }
-}
 } // namespace merlin_hardware_interface
