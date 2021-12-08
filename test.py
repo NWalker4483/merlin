@@ -13,7 +13,7 @@ motor_reductions = np.array([[1/48., 0,     0,      0,          0,        0],
 motor_sprs = 200
 
 degrees_per_step = (360. / motor_sprs) * motor_reductions 
-# port = serial.Serial("/dev/cu.usbmodem14201", 112500)
+port = serial.Serial("/dev/cu.usbmodem1422201", 112500)
 time.sleep(1.5)
 
 def generate_step_instructions(delta_theta, dps=[9, 9, 9, 9, 9, 9]):
@@ -53,7 +53,7 @@ def generate_step_instructions(delta_theta, dps=[9, 9, 9, 9, 9, 9]):
 
 
 def send_instructions(port, instructions):
-    port.write('W'.encode())
+    port.write('T'.encode())
     port.write(str(len(instructions)).encode())
     for in_set in instructions:
         for val in in_set[0]:
@@ -63,18 +63,19 @@ def send_instructions(port, instructions):
 
 speeds = [18, 18, 18, 18, 18, 18]
 
-animation = \
-[[15, -15, 0, 0, 0, 0], [-15, 15, 0, 0, 0, 0],
- [0, 15, 0, 0, 0, 0], [0, -15, 0, 0, 0, 0], 
- [0, 0, 15, 0, 0, 0], [0,0, -15, 0, 0, 0], 
- [0, 0, 0, 15, 0, 0], [0,0, 0, -15, 0, 0], 
- [0, 0, 0, 0, 15, 0], [0,0, 0, 0, -15, 0], 
- [0, 0, 0, 0, 0, 15], [0,0, 0, 0, 0, -15]]
+#[[30, 30, 30, 30, 30, 30],[-30, -30, -30, -30, -30, -30],[15, 0, 0, 0, 0, 0],[-15, 0, 0, 0, 0, 0],[15, 0, 0, 0, 0, 0],[-15, 0, 0, 0, 0, 0],[0, -0, -90, -0, -0, -0]]
 
+animation = \
+[[15, 0, 0, 0, 0, 0],
+ [0, 15, 0, 0, 0, 0], 
+ [0, 0, 15, 0, 0, 0],  
+ [0, 0, 0, 15, 0, 0],  
+ [0, 0, 0, 0, -15, 0],  
+ [0, 0, 0, 0, 0, 15], [-15,-15, -15, -15, 15, -15]]
 input("Start:\n")
 for frame in animation:
-    # send_instructions(port,
-    print(generate_step_instructions(frame, speeds))
+    send_instructions(port,
+    generate_step_instructions(frame, speeds))
     sec = 5 
     input()
 

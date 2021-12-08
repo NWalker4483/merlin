@@ -1,22 +1,17 @@
 # A set of ROS Packages for simulating and controlling the *American Robot* Merlin MR6500 Robotic Arm (In Progress)
-This package provides:
+These packages contain a:
 *  URDF Description
-*  Hardware Interface
-*  Gazebo Setup
+*  Arduino Hardware Interface
+*  Gazebo Model
 *  MoveIt Configuration
+  
+|||
+|------|------|
+|<img src="assets/sim.png" alt="Simulation Image" width="500"></img>|<img src="assets/weld.jpeg" alt="Welding Image" width="500"></img>|
 
-!["Simulation Image"](assets/sim.png)
+go into the move it controller manager XML file and add the line
+<arg name="execution_type" default="unused"/>
 
-!["Welding Image"](assets/weld.jpeg)
+after the move it config has been generated change the controller name in Ross controllers. from arm controller to Merlin/arm controller
 
-https://www.automationdirect.com/adc/shopping/catalog/motion_control/stepper_systems/stepper_drives/dm542e?gclid=CjwKCAjwk6-LBhBZEiwAOUUDp3MxPbv2CRYGqz6yJRTjKBTM930A82qP2HWefs19mRzff58xXHp5CBoCvp8QAvD_BwE
-
-
-
- go into the move it controller manager XML file and add the line
- <arg name="execution_type" default="unused"/>
-
-  after the move it config has been generated change the controller name in Ross controllers. from arm controller to Merlin/arm controller
-
-  read this
-  https://medium.com/@tahsincankose/custom-manipulator-simulation-in-gazebo-and-motion-planning-with-moveit-c017eef1ea90
+Read This: https://medium.com/@tahsincankose/custom-manipulator-simulation-in-gazebo-and-motion-planning-with-moveit-c017eef1ea90
