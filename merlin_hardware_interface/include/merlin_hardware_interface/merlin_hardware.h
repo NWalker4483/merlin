@@ -42,13 +42,11 @@ protected:
   std::vector<int> joint_types_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
-  std::vector<double> joint_accel_;
   std::vector<double> joint_effort_;
 
   Eigen::Matrix<float, 1, 6> motor_spr;
   Eigen::Matrix<float, 6, 6> motor_reductions;
-  Eigen::Matrix<float, 6, 6> degrees_per_step;
-  Eigen::Matrix<float, 6, 6> degrees_per_step_inv;
+  Eigen::Matrix<float, 6, 6> radians_per_step;
 
   std::vector<double> last_position_command_;
 

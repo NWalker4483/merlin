@@ -13,20 +13,29 @@ arm_controller:
     - wrist_rotation
     - wrist_flex
     - hand_roll
-  state_publish_rate:  25
-  action_monitor_rate: 10
-  # # TODO: Read Up on these 
-  # constraints:
-  #   goal_time: 2
-  #   stopped_velocity_tolerance: 0.25
-  #   # waist: {trajectory: 0.3, goal: 0.1}
-  #   # shoulder: {trajectory: 0.75, goal: 0.2}
-  #   # elbow: {trajectory: 0.75, goal: 0.2}
-  #   # wrist_rotation: {trajectory: 0.3, goal: 0.1}
-  #   # wrist_flex: {trajectory: 0.3, goal: 0.1}
-  #   # hand_roll: {trajectory: 0.3, goal: 0.1}
+    
+  constraints:
+    goal_time: 2.5
+    waist: 
+      trajectory: 0.1745
+      goal: 0.05
+    shoulder: 
+      trajectory: 0.1745
+      goal: 0.05
+    elbow: 
+      trajectory: 0.1745
+      goal: 0.05
+    wrist_rotation:
+      trajectory: 0.1745
+      goal: 0.05
+    wrist_flex:
+      trajectory: 0.1745
+      goal: 0.05
+    hand_roll:
+      trajectory: 0.1745
+      goal: 0.05
  
-  # Required because we're controlling a velocity interface but not 
+  # Required to define because we're controlling a velocity interface but not 
   # used since we directly set the velocity in the hardware interface   
   gains:
     waist:          {p: 1,  d: 0, i: 0, i_clamp: 1}

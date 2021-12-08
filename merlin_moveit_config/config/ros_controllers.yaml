@@ -24,25 +24,6 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 
-# Use the config in merlin_description later
-arm_controller:
-  type: velocity_controllers/JointTrajectoryController 
-  joints:
-    - waist
-    - shoulder
-    - elbow
-    - wrist_rotation
-    - wrist_flex
-    - hand_roll
-  state_publish_rate:  25
-  action_monitor_rate: 10
-  gains:
-    waist:          {p: 1,  d: 0, i: 0, i_clamp: 1}
-    shoulder:       {p: 1,  d: 0, i: 0, i_clamp: 1}
-    elbow:          {p: 1,  d: 0, i: 0, i_clamp: 1}
-    wrist_rotation: {p: 1,  d: 0, i: 0, i_clamp: 1}
-    wrist_flex:     {p: 1,  d: 0, i: 0, i_clamp: 1}
-    hand_roll:      {p: 1,  d: 0, i: 0, i_clamp: 1}
 controller_list:
   - name: arm_controller
     action_ns: follow_joint_trajectory

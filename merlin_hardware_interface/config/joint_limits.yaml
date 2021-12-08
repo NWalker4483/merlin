@@ -6,25 +6,25 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 
   elbow:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 
   shoulder:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 
   wrist_rotation:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 
   wrist_flex:
     has_position_limits: true
@@ -33,11 +33,11 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 
   hand_roll:
     has_velocity_limits: true
     max_velocity: 0.314159
     has_acceleration_limits: true
-    max_acceleration: 0.314159
+    max_acceleration: 0.0785398
 

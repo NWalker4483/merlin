@@ -34,8 +34,6 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
 namespace merlin_hardware_interface {
-static const double POSITION_STEP_FACTOR = 10;
-static const double VELOCITY_STEP_FACTOR = 10;
 
 class MerlinHardwareInterface
     : public merlin_hardware_interface::MerlinHardware {

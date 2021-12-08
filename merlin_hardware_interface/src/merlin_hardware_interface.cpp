@@ -2,6 +2,7 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
+#include <ros/console.h>
 #include <merlin_hardware_interface/merlin_hardware_interface.h>
 
 #include <stdio.h>
@@ -12,8 +13,6 @@
 #include <termios.h>
 
 #include <cstddef> // for NULL
-
-// constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
 const int BUFFER_SIZE = 4;
 
 union open_float {
@@ -99,15 +98,18 @@ disable terminal-generated signals */
 }
 void MerlinHardwareInterface::init() {
   // Instantiate SerialPort object.
-  // init_serial();
+  init_serial();
   // TODO: Move reductions to yaml
-  motor_reductions << 1. / 48., 0, 0, 0, 0, 0, 0, 1. / 48., 1. / 48., 0, 0, 0,
-      0, 0, 1. / 48., 0, 0, 0, 0, 0, 0, 1. / 24., -1. / 28.8, 1. / 12., 0, 0, 0,
-      0, 1. / 28.8, -1. / 24., 0, 0, 0, 0, 0, 1. / 24.;
+  motor_reductions << 
+  1. / 48., 0, 0, 0, 0, 0,
+  0, 1. / 48., 1. / 48., 0, 0, 0,
+  0, 0, 1. / 48., 0, 0, 0,
+  0, 0, 0, 1. / 24., -1. / 28.8, -1. / 12.,
+  0, 0, 0, 0, 1. / 28.8, 1. / 24., 
+  0, 0, 0, 0, 0, 1. / 24.;
 
   motor_spr << 200, 200, 200, 200, 200, 200;
-  degrees_per_step = (360. / 200.) * motor_reductions;
-  degrees_per_step_inv = degrees_per_step.transpose().inverse();
+  radians_per_step = (6.283 / 200.) * motor_reductions;
 
   // Get joint names
   nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
@@ -117,7 +119,6 @@ void MerlinHardwareInterface::init() {
   joint_position_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
-  joint_accel_.resize(num_joints_);
 
   joint_position_command_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
@@ -151,7 +152,7 @@ void MerlinHardwareInterface::update(const ros::TimerEvent &e) {
 }
 
 void MerlinHardwareInterface::read() {
-  float ppr = 200; // NOTE: Only use for when using stepper postion from accelstepper
+  float ppr = 200.; // NOTE: Only use for when using stepper postion from accelstepper
   Eigen::Matrix<float, 6, 1> index_cnt;
   Eigen::Matrix<float, 6, 1> pulse_cnt;
   Eigen::Matrix<float, 6, 1> rev_cnt;
@@ -169,6 +170,8 @@ void MerlinHardwareInterface::read() {
    
     int a = ::read(serial_port, &index.array, 4);
     int b = ::read(serial_port, &pulses.array, 4);
+    ROS_INFO("Motor %i: ", i);
+    ROS_INFO("%d pulses\n",(index.val * 200 ) + pulses.val);
     index_cnt.row(i).col(0) << index.val;
     pulse_cnt.row(i).col(0) << pulses.val;
   }
@@ -180,11 +183,13 @@ void MerlinHardwareInterface::read() {
     rev_cnt = pulse_cnt / ppr;
     // Total Joint Revs
     rev_cnt = motor_reductions * rev_cnt;
-    // Total Joint Travel from Zero Position in Rad 
-    rev_cnt *= 6.283;
-for (int i =0; i<6;i++){
-
-joint_position_[i] = rev_cnt.coeff(i,0);
+    // Total Joint Travel from Zero Position in Radians 
+    rev_cnt *= 6.283; //(6.283 / 200.)
+    
+ for (int i = 0; i<6;i++){
+    // ROS_INFO("Motor %d: ",i);
+    // ROS_INFO("%d pulses\n",pulse_cnt.coeff(i,0));
+   joint_position_.at(i) = (double)rev_cnt.coeff(i,0);
 }
 }
 
@@ -192,20 +197,24 @@ void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
   char msg[] = {'W'};
   ::write(serial_port, msg, sizeof(msg));
 
+  // TODO: init with pointer to joint_velocity_command_.data()
   Eigen::Matrix<float, 6, 1> joint_velocity_holder;
 
   for (int joint = 0; joint < 6; joint++) {
-    joint_velocity_holder.row(joint) << joint_velocity_command_[joint];
+    joint_velocity_holder.row(joint) << joint_velocity_command_.at(joint);
   }
 
   Eigen::Matrix<float, 6, 1> steps_per_second =
-      degrees_per_step_inv * joint_velocity_holder;
+      radians_per_step.transpose().inverse() * joint_velocity_holder;
       
     open_float temp;
+    // ROS_INFO("Start Write\n");
     for (int i = 0; i < 6; i++) {
       temp.val = steps_per_second.coeff(i, 0);
+    // ROS_INFO("%f\n", temp.val);
       ::write(serial_port, temp.array, 4); 
     }
+     //ROS_INFO("End Write\n");
   }
 
 } // namespace merlin_hardware_interface
