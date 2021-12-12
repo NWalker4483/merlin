@@ -31,7 +31,7 @@ void handle_commands() {
       }
     }
 
-    if (cmd == 'W') {
+    if (cmd == 'S') {
       for (int motor = 0; motor < 6; motor++) {
         Serial.readBytes(temp.bytes, 4);
         stepper[motor]->setSpeed(temp.value);
@@ -41,20 +41,20 @@ void handle_commands() {
       }
     }
 
-//    if (cmd == 'T') {
-//      while (not Serial.available());
-//      cmd_len = Serial.read() - '0';
-//      // Read upto the next 96 bytes
-//      for (int step_ = 0; step_ < cmd_len; step_++) {
-//        for (int mode = 0; mode < 2; mode++) {
-//          for (int motor = 0; motor < 6; motor++) {
-//            Serial.readBytes(temp.bytes, 4);
-//            cmd_buffer[step_][mode][motor] = temp.value;
-//          }
-//        }
-//      }
-//      cmd_idx = -1;
-//    }
+   if (cmd == 'P') {
+     while (not Serial.available());
+     cmd_len = Serial.read() - '0';
+     // Read upto the next 96 bytes
+     for (int step_ = 0; step_ < cmd_len; step_++) {
+       for (int mode = 0; mode < 2; mode++) {
+         for (int motor = 0; motor < 6; motor++) {
+           Serial.readBytes(temp.bytes, 4);
+           cmd_buffer[step_][mode][motor] = temp.value;
+         }
+       }
+     }
+     cmd_idx = -1;
+   }
   }
 }
 
@@ -66,38 +66,36 @@ void update_arm_state() {
   }
 }
 
-//void update_arm_controls() {
-//  if (cmd_len == 0)
-//    return;
-//  for (int i = 0; i < 6; i++)
-//    stepper[i]->run();
-//
-//  bool done = true;
-//  for (int i = 0; i < 6; i++)
-//    if (stepper[i]->isRunning())
-//      done = false;
-//
-//  if (done) {
-//    cmd_idx = constrain(cmd_idx, -1, cmd_len) + 1;
-//    if (cmd_idx >= cmd_len) {
-//      if (debug)
-//        cmd_idx = 0;
-//      else {
-//        return;
-//      }
-//    }
-//    for (int i = 0; i < 6; i++) {
-//      stepper[i]->setMaxSpeed(cmd_buffer[cmd_idx][1][i]);
-//      stepper[i]->setSpeed(cmd_buffer[cmd_idx][1][i]);
-//      stepper[i]->move(cmd_buffer[cmd_idx][0][i]);
-//    }
-//  };
-//}
+void update_arm_controls() {
+ if (cmd_len == 0)
+   return;
+ for (int i = 0; i < 6; i++)
+   stepper[i]->run();
+
+ bool done = true;
+ for (int i = 0; i < 6; i++)
+   if (stepper[i]->isRunning())
+     done = false;
+
+ if (done) {
+   cmd_idx = constrain(cmd_idx, -1, cmd_len) + 1;
+   if (cmd_idx >= cmd_len) {
+     if (debug)
+       cmd_idx = 0;
+     else {
+       return;
+     }
+   }
+   for (int i = 0; i < 6; i++) {
+     stepper[i]->setMaxSpeed(cmd_buffer[cmd_idx][1][i]);
+     stepper[i]->setSpeed(cmd_buffer[cmd_idx][1][i]);
+     stepper[i]->move(cmd_buffer[cmd_idx][0][i]);
+   }
+ };
+}
 
 void loop() {
   handle_commands();
-  for (int i = 0; i < 6; i++)
-    stepper[i]->runSpeed();
-  //   update_arm_controls();
+  update_arm_controls();
   update_arm_state();
 }

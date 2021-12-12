@@ -13,7 +13,7 @@ motor_reductions = np.array([[1/48., 0,     0,      0,          0,      0],
 
 motor_sprs = np.array([200, 200, 200, 200, 200, 200]).T
 
-degrees_per_step = (360. / motor_sprs) * motor_reductions.T
+radians_per_step = (360. / motor_sprs) * motor_reductions.T
 
 def generate_step_instructions(delta_theta, dps = [9, 9, 9, 9, 9, 9]):
     assert((np.sign(delta_theta) == np.sign(dps)).all())
@@ -33,12 +33,12 @@ def generate_step_instructions(delta_theta, dps = [9, 9, 9, 9, 9, 9]):
         if min_travel_time == np.inf:
             break
 
-        steps_per_second = np.linalg.solve(degrees_per_step, dps)
+        steps_per_second = np.linalg.solve(radians_per_step, dps)
                 
         # Compute which Joint to a complete first and then re-calculate motor speeds
         steps_to_take = min_travel_time * steps_per_second
         steps_to_take = steps_to_take.astype(int)
-        sub_delta_theta = np.dot(steps_to_take, degrees_per_step.T)
+        sub_delta_theta = np.dot(steps_to_take, radians_per_step.T)
 
         delta_theta = delta_theta - sub_delta_theta
 

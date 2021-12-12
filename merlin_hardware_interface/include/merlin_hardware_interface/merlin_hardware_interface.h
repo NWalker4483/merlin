@@ -53,7 +53,7 @@ protected:
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
-  PosVelAccJointInterface posvelaccJointInterface;
+  PosVelJointInterface posvelJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   double loop_hz_;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
