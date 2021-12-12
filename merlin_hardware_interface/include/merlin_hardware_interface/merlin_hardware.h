@@ -50,13 +50,13 @@ protected:
 
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
-  
-  std::vector<double> joint_position_command_[6];
-  std::vector<double> joint_velocity_command_[6];
 
-  std::vector<double> last_position_command_[6];
-  std::vector<double> last_velocity_command_[6];
-  
+  std::vector<double> joint_position_command_;
+  std::vector<double> joint_velocity_command_;
+
+  std::vector<double> last_position_command_;
+  std::vector<double> last_velocity_command_;
+
   std::vector<double> joint_lower_limits_;
   std::vector<double> joint_upper_limits_;
 
