@@ -217,7 +217,7 @@ void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
   Eigen::Matrix<float, 6, 1> joint_dtheta_holder;
 
   for (int joint = 0; joint < 6; joint++) {
-    float d_theta = joint_position_[joint] - joint_position_command_[joint];
+    float d_theta =  joint_position_command_[joint] - joint_position_[joint];
     // WARN: This is an arbitrary and incorrect 1 Degree tolerance
     d_theta = d_theta <= 0.0174533 ? 0 : d_theta;
     joint_dtheta_holder.row(joint) << d_theta;

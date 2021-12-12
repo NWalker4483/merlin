@@ -15,24 +15,24 @@ arm_controller:
     - hand_roll
   # Update with real motor precision limits 
   constraints:
-    goal_time: 2.5
+    # goal_time: 2.5
     waist: 
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
     shoulder: 
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
     elbow: 
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
     wrist_rotation:
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
     wrist_flex:
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
     hand_roll:
-      trajectory: 0.1745
+      #trajectory: 0.1745
       goal: 0.05
  
   # Required to define because we're controlling a velocity interface but not 

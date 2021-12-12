@@ -15,10 +15,11 @@ void load_saved_state() {}
 
 void setup() {
   Serial.begin(115200);
-
   setup_steppers();
   load_saved_state();
 }
+
+bool new_cmd_flag = false;
 
 void handle_commands() {
   if (Serial.available() > 0) {
@@ -30,18 +31,22 @@ void handle_commands() {
         Serial.write(pulse_cnt[motor].bytes, 4);
       }
     }
+    if (cmd == 'E') {
+      for (int motor = 0; motor < 6; motor++) {
+        Serial.write(index_cnt[motor].bytes, 4);
+      }
+    }
 
     if (cmd == 'S') {
       for (int motor = 0; motor < 6; motor++) {
         Serial.readBytes(temp.bytes, 4);
         stepper[motor]->setSpeed(temp.value);
-        
         stepper[motor]->move(temp.value > 0 ? 100000: -100000);
       if (temp.value == 0) stepper[motor]->move(0);
       }
     }
 
-   if (cmd == 'P') {
+   if (cmd == 'T') {
      while (not Serial.available());
      cmd_len = Serial.read() - '0';
      // Read upto the next 96 bytes
@@ -53,6 +58,7 @@ void handle_commands() {
          }
        }
      }
+     new_cmd_flag = true;
      cmd_idx = -1;
    }
   }
@@ -77,7 +83,8 @@ void update_arm_controls() {
    if (stepper[i]->isRunning())
      done = false;
 
- if (done) {
+ if (done or new_cmd_flag) {
+  new_cmd_flag = false;
    cmd_idx = constrain(cmd_idx, -1, cmd_len) + 1;
    if (cmd_idx >= cmd_len) {
      if (debug)
