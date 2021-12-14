@@ -246,9 +246,9 @@ void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
     Eigen::Matrix<float, 6, 1> steps_per_second =
         radians_per_step_t_inv * joint_velocity_holder;
     Eigen::Matrix<float, 6, 1> steps_to_take =
-        steps_per_second * min_travel_time;
+        min_travel_time * steps_per_second;
     Eigen::Matrix<float, 6, 1> sub_delta_theta =
-        steps_to_take.transpose() * radians_per_step;
+        radians_per_step.transpose() * steps_to_take;
 
     joint_dtheta_holder -= sub_delta_theta;
 

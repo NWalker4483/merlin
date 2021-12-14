@@ -31,6 +31,7 @@ void handle_commands() {
         Serial.write(pulse_cnt[motor].bytes, 4);
       }
     }
+    
     if (cmd == 'E') {
       for (int motor = 0; motor < 6; motor++) {
         Serial.write(index_cnt[motor].bytes, 4);

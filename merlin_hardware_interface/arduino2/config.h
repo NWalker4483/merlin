@@ -34,14 +34,12 @@ AccelStepper *stepper[6];
 int a = 250;
 int b = 250;
 
-int cmd_buffer[6][2][6] = {{{a, a, a, a, a, a}, {b, b, b, b, b, b}},
-                           {{-a, -a, -a, -a, -a, -a}, {b, b, b, b, b, b}}};
-
+int cmd_buffer[6][2][6];
 int cmd_idx = -1;
 
 bool debug = 1;
-int cmd_len = 2;
-
+int cmd_len = 0;
+bool restart = false;
 union open_float
 {
   char bytes[4];
