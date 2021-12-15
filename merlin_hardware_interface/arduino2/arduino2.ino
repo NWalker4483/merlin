@@ -31,8 +31,10 @@ void setup_steppers()
   stepper[3] = &stepper4;
   stepper[4] = &stepper5;
   stepper[5] = &stepper6;
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < 6; i++){
+    stepper[i]->setMinPulseWidth(2000);
     stepper[i]->setAcceleration(4000);
+  }
 }
 void update_encode_states(){
   }
@@ -52,7 +54,10 @@ void solve_motor_speeds()
   {
     if (abs(delta_theta(joint)) >= radians_per_step(joint, joint)) {
       changed = true;
-    }
+      if (delta_theta(joint) > 0){
+        target_poses(joint) *= -1;
+      }
+    } else {delta_theta(joint) = 0;}
   }
   if (not changed) return;
   else {
@@ -65,26 +70,29 @@ void solve_motor_speeds()
     bool change = false;
     for (int joint = 0; joint < 6; joint++)
     {
-      if ((abs(delta_theta(joint)) >= radians_per_step(joint, joint)) and (target_speeds(joint) != 0))
+      if ((abs(delta_theta(joint)) > radians_per_step(joint, joint)) and (target_speeds(joint) != 0))
       {
         change = true;
         float travel_time = delta_theta(joint) / target_speeds(joint);
         if (travel_time < min_travel_time)
           min_travel_time = travel_time;
-      }
-
+      } else {
+        delta_theta(joint) = 0;
+        }
     }
     if (not change)
       break;
     BLA::Matrix<6, 1> steps_per_second = radians_per_step_inv * target_speeds;
-    BLA::Matrix<6, 1> steps_to_take = steps_per_second * min_travel_time;
+    BLA::Matrix<6, 1, BLA::Array<6,1,float>> steps_to_take_float = steps_per_second * min_travel_time;
+    BLA::Matrix<6, 1, BLA::Array<6,1,int>> steps_to_take = steps_to_take_float;
     BLA::Matrix<6, 1> sub_delta_theta = radians_per_step * steps_to_take;
     delta_theta -= sub_delta_theta;
+    
+    cmd_len = stage + 1;
     for (int i = 0; i < 6; i++)
       cmd_buffer[stage][0][i] = steps_to_take(i);
     for (int i = 0; i < 6; i++)
       cmd_buffer[stage][1][i] = steps_per_second(i);
-    cmd_len = stage + 1;
   }
 }
 
@@ -114,7 +122,7 @@ void handle_commands()
       }
       for (int i = 0; i < 6; i++) {
         Serial.readBytes(temp.bytes, 4);
-        target_speeds(i) = temp.value;
+        target_speeds(i) = abs(temp.value);
       }
       solve_motor_speeds();
     }
@@ -131,25 +139,17 @@ void setup()
   radians_per_step_inv = radians_per_step;
 
   if (not Invert(radians_per_step_inv)) {
-    Serial.println("\nInversion Failed");
+//    Serial.println("\nInversion Failed");
   }
   else {
-    Serial.println("\nInversion Good\nRadian Per Step Inv \n");
+//    Serial.println("\nInversion Good\nRadian Per Step Inv \n");
   }
-
-//  for (int row = 0; row < 6; row ++) {
-//    for (int col = 0; col < 6; col ++) {
-//      Serial.print(radians_per_step_inv(row, col), 5);
-//      Serial.print(" ");
-//    } Serial.println(" ");
-//  }
 }
 
 bool run_commands()
 {
   bool done = true;
-  for (int i = 0; i < 6; i++)
-    if (stepper[i]->isRunning()) done = false;
+  for (int i = 0; i < 6; i++) if (stepper[i]->distanceToGo() != 0) done = false;
 
   if (done or restart)
   {
@@ -158,16 +158,21 @@ bool run_commands()
       return false;
     else
       cmd_idx += 1;
+      
     for (int i = 0; i < 6; i++)
     {
       stepper[i]->setMaxSpeed(cmd_buffer[cmd_idx][1][i]);
       stepper[i]->setSpeed(cmd_buffer[cmd_idx][1][i]);
       stepper[i]->move(cmd_buffer[cmd_idx][0][i]);
+      Serial.print(cmd_buffer[cmd_idx][0][i]);
+      Serial.print(" ");
+      Serial.println(cmd_buffer[cmd_idx][1][i]);
     }
   }
-  if (not done) {
-    for (int i = 0; i < 6; i++) stepper[i]->run();
-  }
+    for (int i = 0; i < 6; i++) {
+      stepper[i]->run();
+    }
+  
   return true;
 }
 bool toggle = false;
@@ -177,10 +182,11 @@ void loop()
   update_arm_state();
   handle_commands();
   bool running_ = run_commands();
-  if (not running_){
-    target_speeds.Fill(toggle? -9.: 9.);
-    target_poses.Fill(toggle? 15 : 0);
+if (not running_){
+delay(500);
+  target_speeds.Fill(toggle? 9.: 9.);
+   target_poses.Fill(toggle? 5. : 0.);
     toggle = not toggle;
-    solve_motor_speeds();
+   solve_motor_speeds();
   }
 }
