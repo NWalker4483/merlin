@@ -1,6 +1,7 @@
 merlin:
   hardware_interface:
-    loop_hz: 10 # hz
+    loop_hz: 1 # hz
+    port: /dev/ttyACM0
     joints:
       - waist
       - shoulder

@@ -40,6 +40,8 @@ MerlinHardwareInterface::MerlinHardwareInterface(ros::NodeHandle &nh)
       new controller_manager::ControllerManager(this, nh_));
 
   nh_.param("/merlin/hardware_interface/loop_hz", loop_hz_, 0.1);
+  nh_.param("/merlin/hardware_interface/port", port_name, "/dev/ttyACM0");
+  
 
   ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
   non_realtime_loop_ =
@@ -50,7 +52,7 @@ MerlinHardwareInterface::~MerlinHardwareInterface() {}
 void MerlinHardwareInterface::init_serial() {
 
   /* Open the file descriptor in non-blocking mode */
-  serial_port = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
+  serial_port = open(port_name, O_RDWR | O_NOCTTY);
 
   // Check for errors
   if (serial_port < 0) {
@@ -64,9 +66,9 @@ void MerlinHardwareInterface::init_serial() {
 
   /* Set custom options */
 
-  /* 9600 baud */
-  cfsetispeed(&toptions, B115200);
-  cfsetospeed(&toptions, B115200);
+  /* 500000 baud */
+  cfsetispeed(&toptions, B500000);
+  cfsetospeed(&toptions, B500000);
   /* 8 bits, no parity, no stop bits */
   toptions.c_cflag &= ~PARENB;
   toptions.c_cflag &= ~CSTOPB;
@@ -76,7 +78,7 @@ void MerlinHardwareInterface::init_serial() {
   toptions.c_cflag &= ~CRTSCTS;
   /* enable receiver, ignore status lines */
   toptions.c_cflag |= CREAD | CLOCAL;
-  /* disable input/output flow control, disable restart chars */
+  /* disable input/output flow control, disable interrupt chars */
   toptions.c_iflag &= ~(IXON | IXOFF | IXANY);
   /* disable canonical input, disable echo,
 disable visually erase chars,
@@ -103,14 +105,6 @@ disable terminal-generated signals */
 void MerlinHardwareInterface::init() {
   // Instantiate SerialPort object.
   init_serial();
-  // TODO: Move reductions to yaml
-  motor_reductions << 1. / 48., 0, 0, 0, 0, 0, 0, 1. / 48., 1. / 48., 0, 0, 0,
-      0, 0, 1. / 48., 0, 0, 0, 0, 0, 0, 1. / 24., -1. / 28.8, 1. / 12., 0, 0, 0,
-      0, 1. / 28.8, -1. / 24., 0, 0, 0, 0, 0, 1. / 24.;
-
-  // motor_spr = MatrixXd::Constant(6, 1, 200.);
-  radians_per_step = (6.283 / 200.) * motor_reductions;
-  radians_per_step_t_inv = radians_per_step.transpose().inverse();
 
   // Get joint names
   nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
@@ -163,7 +157,7 @@ void MerlinHardwareInterface::read() {
 
   for (int i = 0; i < 6; i++) {
     int b = ::read(serial_port, &temp.array, 4);
-    joint_position_[i] =  temp.val * (3.1415926/180.);
+    joint_position_[i] = temp.val * (3.1415926/180.);
   }
 }
 
@@ -176,13 +170,13 @@ void MerlinHardwareInterface::write(ros::Duration elapsed_time) {
   for (int stage = 0; stage < 6; stage++) {
     temp.val = (float)joint_position_command_[stage];
 
-    temp.val *=  (180./3.1415926);
+    temp.val *= (180./3.1415926);
     ::write(serial_port, temp.array, 4);
 }
   for (int stage = 0; stage < 6; stage++) {
     temp.val = (float)joint_velocity_command_[stage];
-    temp.val *=  (180./3.1415926);
-        ::write(serial_port, temp.array, 4);
+    temp.val *= (180./3.1415926);
+    ::write(serial_port, temp.array, 4);
 }
 }
 } // namespace merlin_hardware_interface

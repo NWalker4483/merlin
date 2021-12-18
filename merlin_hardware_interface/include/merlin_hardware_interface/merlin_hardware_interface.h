@@ -48,13 +48,14 @@ public:
 
 protected:
   ros::NodeHandle nh_;
-  int serial_port;
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
   PosVelJointInterface posvelJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
+  int serial_port;
+  std::string port_name;
   double loop_hz_;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   double p_error_, v_error_, e_error_;
