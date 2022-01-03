@@ -28,7 +28,7 @@ protected:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::PositionJointInterface position_joint_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
-  hardware_interface::PosVelAccJointInterface posvelaccJointInterface;
+  hardware_interface::PosVelJointInterface posvelJointInterface;
 
   joint_limits_interface::PositionJointSaturationInterface
       position_joint_saturation_interface_;
@@ -40,18 +40,22 @@ protected:
   int joint_mode_; // position, velocity, or effort
   std::vector<std::string> joint_names_;
   std::vector<int> joint_types_;
-  std::vector<double> joint_position_;
-  std::vector<double> joint_velocity_;
-  std::vector<double> joint_effort_;
+
+  std::vector<double> joint_effort_; // Necessary but unused
 
   Eigen::Matrix<float, 1, 6> motor_spr;
   Eigen::Matrix<float, 6, 6> motor_reductions;
   Eigen::Matrix<float, 6, 6> radians_per_step;
+  Eigen::Matrix<float, 6, 6> radians_per_step_t_inv;
 
-  std::vector<double> last_position_command_;
+  std::vector<double> joint_position_;
+  std::vector<double> joint_velocity_;
 
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;
+
+  std::vector<double> last_position_command_;
+  std::vector<double> last_velocity_command_;
 
   std::vector<double> joint_lower_limits_;
   std::vector<double> joint_upper_limits_;

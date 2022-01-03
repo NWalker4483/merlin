@@ -12,6 +12,10 @@ These packages contain a:
 go into the move it controller manager XML file and add the line
 <arg name="execution_type" default="unused"/>
 
-after the move it config has been generated change the controller name in Ross controllers. from arm controller to Merlin/arm controller
-
+## TODD: 
+* Test teensy 4.1 with ROS Control 
+* Added Serial Connection Checking to the hardware interface
+  * When the usb isnt connect it should throw a std ROS error
+* Get Robot port from hardware.yaml file instead of hardcoding it 
+* 
 Read This: https://medium.com/@tahsincankose/custom-manipulator-simulation-in-gazebo-and-motion-planning-with-moveit-c017eef1ea90
