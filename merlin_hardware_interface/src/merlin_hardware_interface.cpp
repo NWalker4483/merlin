@@ -12,9 +12,7 @@
 #include <termios.h>
 
 #include <cstddef> // for NULL
-
-// constexpr const char *const SERIAL_PORT_1 = "/dev/ttyACM0";
-const int BUFFER_SIZE = 4;
+#include <ros/console.h>
 
 union open_float
 {
@@ -56,7 +54,7 @@ namespace merlin_hardware_interface
     // Check for errors
     if (serial_port < 0)
     {
-      printf("Error %i from open: %s\n", errno, strerror(errno));  
+      ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
       exit( 1 );
     }
     
@@ -116,13 +114,15 @@ namespace merlin_hardware_interface
     // Resize vectors
     joint_position_.resize(num_joints_);
     joint_velocity_.resize(num_joints_);
+    joint_acceleration_.resize(num_joints_);
     joint_effort_.resize(num_joints_);
 
     joint_position_command_.resize(num_joints_);
     joint_velocity_command_.resize(num_joints_);
+    joint_acceleration_command.resize(num_joints_);
 
-    last_position_command_.resize(num_joints_);
-    last_velocity_command_.resize(num_joints_);
+    // last_position_command_.resize(num_joints_);
+    // last_velocity_command_.resize(num_joints_);
 
     // Initialize Controller
     for (int i = 0; i < num_joints_; ++i)
@@ -132,19 +132,27 @@ namespace merlin_hardware_interface
                                         &joint_velocity_[i], &joint_effort_[i]);
       joint_state_interface_.registerHandle(jointStateHandle);
 
-      // connect and register the joint position interface
+      // connect and register the joint position velocity interface
       PosVelJointHandle jointPosVelHandle(jointStateHandle,
                                           &joint_position_command_[i],
                                           &joint_velocity_command_[i]);
       posvelJointInterface.registerHandle(jointPosVelHandle);
 
-      // TODO: Enforce soft joint limits interface
+       // connect and register the joint position velocity acceleration interface
+      PosVelAccJointHandle jointPosVelAccHandle(jointStateHandle,
+                                          &joint_position_command_[i],
+                                          &joint_velocity_command_[i],
+                                          &joint_acceleration_command[i]);
+      posvelaccJointInterface.registerHandle(jointPosVelAccHandle);
+
+      // TODO: Setup enforce soft joint limits interface
       JointLimits limits;
       getJointLimits(joint_names_[i], nh_, limits);
     };
 
     registerInterface(&joint_state_interface_);
     registerInterface(&posvelJointInterface);
+    registerInterface(&posvelaccJointInterface);
   }
 
   void MerlinHardwareInterface::update(const ros::TimerEvent &e)

@@ -51,10 +51,14 @@ protected:
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
+
   PositionJointInterface positionJointInterface;
   PosVelJointInterface posvelJointInterface;
+  PosVelAccJointInterface posvelaccJointInterface;
+
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   // PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
+  
   int serial_port;
   std::string port_name;
   double loop_hz_;
