@@ -1,0 +1,14 @@
+Track arm position in degrees // or radians
+
+Choose to run without accelerations
+
+
+Set joint targets in degrees
+
+Set joint speeds in degrees per second
+
+Set joint accelerations in degrees per second ^ 2
+
+Directly set and get motor positions 
+
+Review acceleration equations
