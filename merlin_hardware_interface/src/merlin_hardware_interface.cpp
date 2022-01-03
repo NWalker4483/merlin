@@ -39,7 +39,7 @@ namespace merlin_hardware_interface
         new controller_manager::ControllerManager(this, nh_));
 
     nh_.param("/merlin/hardware_interface/loop_hz", loop_hz_, 0.1);
-    nh_.param("/merlin/hardware_interface/port", port_name, "/dev/ttyACM0");
+    nh.param<std::string>("/merlin/hardware_interface/port", port_name, "/dev/ttyACM0");
 
     ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
     non_realtime_loop_ =
@@ -56,9 +56,10 @@ namespace merlin_hardware_interface
     // Check for errors
     if (serial_port < 0)
     {
-      printf("Error %i from open: %s\n", errno, strerror(errno));
-      
+      printf("Error %i from open: %s\n", errno, strerror(errno));  
+      exit( 1 );
     }
+    
     /* Set up the control structure */
     struct termios toptions;
 

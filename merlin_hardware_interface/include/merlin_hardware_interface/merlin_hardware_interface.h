@@ -54,6 +54,7 @@ protected:
   PositionJointInterface positionJointInterface;
   PosVelJointInterface posvelJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
+  // PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   int serial_port;
   std::string port_name;
   double loop_hz_;

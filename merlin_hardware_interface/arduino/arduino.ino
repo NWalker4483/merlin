@@ -21,10 +21,7 @@ void setup()
     {0, 0, 0,                -1. / 12., 1. / 24., 1. / 24.}
   };
 
-
-
-  
-  double speeds[6] = { 18,9,18,9,9,9 };
+  double speeds[6] = {18, 9, 18, 9, 9, 9 };
   merlin.setMotorReductions(reductions);
   merlin.setTargetSpeeds(speeds);
   double accel[6] = { 5,5,5,5,5,5 };
