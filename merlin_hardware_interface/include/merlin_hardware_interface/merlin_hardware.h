@@ -54,7 +54,7 @@ protected:
 
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;
-  std::vector<double> v;
+  std::vector<double> joint_acceleration_command_;
 
   // std::vector<double> last_position_command_;
   // std::vector<double> last_velocity_command_;

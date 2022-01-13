@@ -49,12 +49,12 @@ namespace merlin_hardware_interface
   {
 
     /* Open the file descriptor in non-blocking mode */
-    serial_port = open(port_name, O_RDWR | O_NOCTTY);
+    serial_port = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
 
     // Check for errors
     if (serial_port < 0)
     {
-      ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
+      // ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
       exit( 1 );
     }
     
@@ -119,7 +119,7 @@ namespace merlin_hardware_interface
 
     joint_position_command_.resize(num_joints_);
     joint_velocity_command_.resize(num_joints_);
-    joint_acceleration_command.resize(num_joints_);
+    joint_acceleration_command_.resize(num_joints_);
 
     // last_position_command_.resize(num_joints_);
     // last_velocity_command_.resize(num_joints_);
@@ -142,7 +142,7 @@ namespace merlin_hardware_interface
       PosVelAccJointHandle jointPosVelAccHandle(jointStateHandle,
                                           &joint_position_command_[i],
                                           &joint_velocity_command_[i],
-                                          &joint_acceleration_command[i]);
+                                          &joint_acceleration_command_[i]);
       posvelaccJointInterface.registerHandle(jointPosVelAccHandle);
 
       // TODO: Setup enforce soft joint limits interface
