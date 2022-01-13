@@ -180,7 +180,7 @@
   <origin rpy="0 0 0" xyz="-0.082296 0.0 -0.045846"/>
   <parent link="Lower_Head_1"/>
   <child link="Upper_Head_1"/>
-  <axis xyz="-0.0 0.0 1.0"/>
+  <axis xyz="-0.0 0.0 -1.0"/>
   <limit effort="100" lower="-1.570796" upper="1.570796" velocity="100"/>
 </joint>
 
@@ -188,7 +188,7 @@
   <origin rpy="0 0 0" xyz="-0.0889 0.0 0.045846"/>
   <parent link="Upper_Head_1"/>
   <child link="Face_Plate_1"/>
-  <axis xyz="-1.0 0.0 0.0"/>
+  <axis xyz="1.0 0.0 0.0"/>
 </joint>
 
 <joint name="elbow" type="continuous">
