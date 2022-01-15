@@ -212,7 +212,7 @@ void RobotArm::runToPositions()
 
 void RobotArm::checkSpeedsForDirection() {
   for (int i = 0; i < 6; i++) {
-    _speeds[i] = fabs(_speeds[i]) * ((target_poses[i] > current_poses(i)) ? 1 : -1 );
+    target_speeds[i] = fabs(target_speeds[i]) * ((target_poses[i] > current_poses(i)) ? 1 : -1 );
   }
   _target_changed = false;
 }

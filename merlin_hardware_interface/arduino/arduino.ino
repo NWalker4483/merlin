@@ -3,6 +3,7 @@
 
 RobotArm merlin;
 
+  double speeds[6] = {18, 18, 18, 18, 18, 18};
 void setup()
 {
   merlin.assignStepper(0, stepper1);
@@ -16,33 +17,35 @@ void setup()
       {1. / 48., 0, 0, 0, 0, 0},
       {0, 1. / 48., 0, 0, 0, 0},
       {0, -1. / 48., 1. / 48., 0, 0, 0},
-      {0, 0, 0, 1. / 24., 0, 0},
-      {0, 0, 0, -1. / 28.8, 1. / 28.8, 0},
-      {0, 0, 0, -1. / 12., 1. / 24., 1. / 24.}};
+      {0, 0, 0,                1. / 24.,   0, 0},
+      {0, 0, 0,               -1. / 28.8, 1. / 28.8, 0},
+      {0, 0, 0,               -1. / 12.,  1. / 24., 1. / 24.}};
 
-  double speeds[6] = {18, 9, 18, 9, 9, 9};
   merlin.setMotorReductions(reductions);
   merlin.setTargetSpeeds(speeds);
-  double accel[6] = {5, 5, 5, 5, 5, 5};
+  double accel[6] = {9, 9, 9, 9, 9, 9};
   merlin.setAccelerations(accel);
-  merlin.setFrequency(60.);
+  merlin.setFrequency(120.);
   Serial.begin(BAUD_RATE);
 }
 void handle_commands();
 void loop()
 {
   handle_commands();
-  merlin.runSpeedToPositions();
-  //  double end[6] = {45,45,45,0,0,0 };
-  //  merlin.moveAllTo(end);
-  //  merlin.runToPositions();
-  //  for (int i = 0; i < 6; i++) {Serial.print(" ");Serial.print(merlin.currentPosition(i));}
-  //  Serial.println("\nPath Done");
-  //
-  // double zero[6] = { 0 };
-  // merlin.runToNewPositions(zero);
-  // for (int i = 0; i < 6; i++) {Serial.print(" ");Serial.print(merlin.currentPosition(i));}
-  // Serial.println("\nPath Done");
+ merlin.runSpeedToPositions();
+// merlin.setTargetSpeeds(speeds);
+//
+//for (int i = 0; i < 6; i++){
+//  merlin.moveTo(i, 25);
+//  merlin.runToPositions();
+//  delay(500);
+//  }
+//  
+//  for (int i = 0; i < 6; i++){
+//    merlin.moveTo(i, 0);
+//  }
+//  merlin.runToPositions();
+//  delay(2000);
 }
 
 void handle_commands()

@@ -1,6 +1,6 @@
 
 #include "speed_stepper.h"
-#define BAUD_RATE 500000
+#define BAUD_RATE 4000000
 #define SPR 200
 #define PPR 1000
 
