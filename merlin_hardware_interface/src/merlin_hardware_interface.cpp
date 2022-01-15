@@ -39,6 +39,9 @@ namespace merlin_hardware_interface
     nh_.param("/merlin/hardware_interface/loop_hz", loop_hz_, 0.1);
     nh.param<std::string>("/merlin/hardware_interface/port", port_name, "/dev/ttyACM0");
 
+    // Instantiate SerialPort object.
+    init_serial();
+
     ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
     non_realtime_loop_ =
         nh_.createTimer(update_freq, &MerlinHardwareInterface::update, this);
@@ -49,12 +52,12 @@ namespace merlin_hardware_interface
   {
 
     /* Open the file descriptor in non-blocking mode */
-    serial_port = open(port_name, O_RDWR | O_NOCTTY);
+    serial_port = open(port_name.c_str(), O_RDWR | O_NOCTTY);
 
     // Check for errors
     if (serial_port < 0)
     {
-      ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
+      // ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
       exit( 1 );
     }
     
@@ -67,8 +70,8 @@ namespace merlin_hardware_interface
     /* Set custom options */
 
     /* 500000 baud */
-    cfsetispeed(&toptions, B500000);
-    cfsetospeed(&toptions, B500000);
+    cfsetispeed(&toptions, B4000000);
+    cfsetospeed(&toptions, B4000000);
     /* 8 bits, no parity, no stop bits */
     toptions.c_cflag &= ~PARENB;
     toptions.c_cflag &= ~CSTOPB;
@@ -104,9 +107,6 @@ namespace merlin_hardware_interface
   }
   void MerlinHardwareInterface::init()
   {
-    // Instantiate SerialPort object.
-    init_serial();
-
     // Get joint names
     nh_.getParam("/merlin/hardware_interface/joints", joint_names_);
     num_joints_ = joint_names_.size();
@@ -119,7 +119,7 @@ namespace merlin_hardware_interface
 
     joint_position_command_.resize(num_joints_);
     joint_velocity_command_.resize(num_joints_);
-    joint_acceleration_command.resize(num_joints_);
+    joint_acceleration_command_.resize(num_joints_);
 
     // last_position_command_.resize(num_joints_);
     // last_velocity_command_.resize(num_joints_);
@@ -142,7 +142,7 @@ namespace merlin_hardware_interface
       PosVelAccJointHandle jointPosVelAccHandle(jointStateHandle,
                                           &joint_position_command_[i],
                                           &joint_velocity_command_[i],
-                                          &joint_acceleration_command[i]);
+                                          &joint_acceleration_command_[i]);
       posvelaccJointInterface.registerHandle(jointPosVelAccHandle);
 
       // TODO: Setup enforce soft joint limits interface

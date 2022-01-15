@@ -16,11 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   control_toolbox
   joint_limits_interface
 )
-SET( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" )
-IF( NOT EIGEN3_INCLUDE_DIR )
-    MESSAGE( FATAL_ERROR "Please point the environment variable EIGEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
-ENDIF()
-
 
 catkin_package(
   INCLUDE_DIRS 
@@ -43,7 +38,6 @@ catkin_package(
 include_directories(
   include/
   /usr/include/
-  "$ENV{EIGEN3_INCLUDE_DIR}"
   ${catkin_INCLUDE_DIRS})
 
 install(DIRECTORY include/${PROJECT_NAME}/

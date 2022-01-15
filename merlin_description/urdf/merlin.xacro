@@ -157,8 +157,13 @@
   <origin rpy="0 0 0" xyz="0.0 0.0 0.822325"/>
   <parent link="base_link"/>
   <child link="Waist_1"/>
+<<<<<<< HEAD
   <axis xyz="0.0 0.0 1.0"/>
   <limit effort="100" lower="-4.537856" upper="0.523599" velocity="100"/>
+=======
+  <axis xyz="0.0 0.0 -1.0"/>
+  <limit effort="100" lower="0.0" upper="5.061455" velocity="100"/>
+>>>>>>> b932141abf67f0c7553eb5c5d4d8cc8176031b3b
 </joint>
 
 <joint name="shoulder" type="continuous">
@@ -179,7 +184,7 @@
   <origin rpy="0 0 0" xyz="-0.082296 0.0 -0.045846"/>
   <parent link="Lower_Head_1"/>
   <child link="Upper_Head_1"/>
-  <axis xyz="-0.0 0.0 1.0"/>
+  <axis xyz="-0.0 0.0 -1.0"/>
   <limit effort="100" lower="-1.570796" upper="1.570796" velocity="100"/>
 </joint>
 
@@ -187,14 +192,14 @@
   <origin rpy="0 0 0" xyz="-0.0889 0.0 0.045846"/>
   <parent link="Upper_Head_1"/>
   <child link="Face_Plate_1"/>
-  <axis xyz="-1.0 0.0 0.0"/>
+  <axis xyz="1.0 0.0 0.0"/>
 </joint>
 
 <joint name="elbow" type="continuous">
   <origin rpy="0 0 0" xyz="0.0 -0.2032 -0.441452"/>
   <parent link="Shoulder_1"/>
   <child link="Elbow_1"/>
-  <axis xyz="0.0 1.0 0.0"/>
+  <axis xyz="0.0 -1.0 0.0"/>
 </joint>
 
 <joint name="world" type="fixed">

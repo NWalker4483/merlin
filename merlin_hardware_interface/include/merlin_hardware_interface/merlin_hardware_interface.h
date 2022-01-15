@@ -57,7 +57,6 @@ protected:
   PosVelAccJointInterface posvelaccJointInterface;
 
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
-  // PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   
   int serial_port;
   std::string port_name;

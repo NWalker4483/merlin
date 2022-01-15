@@ -14,11 +14,8 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <ros/ros.h>
 
-#include <Eigen/Dense>
-#include <iostream>
 
 using namespace std;
-using namespace Eigen;
 
 namespace merlin_hardware_interface {
 /// \brief Hardware interface for a robot
@@ -43,21 +40,13 @@ protected:
 
   std::vector<double> joint_effort_; // Necessary but unused
 
-  Eigen::Matrix<float, 1, 6> motor_spr;
-  Eigen::Matrix<float, 6, 6> motor_reductions;
-  Eigen::Matrix<float, 6, 6> radians_per_step;
-  Eigen::Matrix<float, 6, 6> radians_per_step_t_inv;
-
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
   std::vector<double> joint_acceleration_;
 
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;
-  std::vector<double> v;
-
-  // std::vector<double> last_position_command_;
-  // std::vector<double> last_velocity_command_;
+  std::vector<double> joint_acceleration_command_;
 
   std::vector<double> joint_lower_limits_;
   std::vector<double> joint_upper_limits_;
