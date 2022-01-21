@@ -3,7 +3,8 @@
 
 RobotArm merlin;
 
-  double speeds[6] = {18, 18, 18, 18, 18, 18};
+double speeds[6] = {18, 18, 18, 18, 18, 18};
+
 void setup()
 {
   merlin.assignStepper(0, stepper1);
@@ -31,7 +32,7 @@ void setup()
 void handle_commands();
 void loop()
 {
-  handle_commands();
+handle_commands();
  merlin.runSpeedToPositions();
 // merlin.setTargetSpeeds(speeds);
 //
@@ -62,7 +63,7 @@ void handle_commands()
         Serial.write(temp.bytes, 4);
       }
     }
-    if (cmd == 'P') // Pose Command
+    if (cmd == 'P') // Single Pose Command
     {
       while (not Serial.available() > 0)
         ; // (4 * 6 * 2)
@@ -83,7 +84,7 @@ void handle_commands()
         merlin.setTargetSpeed(i, temp.value);
       }
     }
-    if (cmd == 'T') // Trajectory Point Command
+    if (cmd == 'T') // Single Trajectory Point Command
     {
       while (not Serial.available() > 0)
         ; // (4 * 6 * 2)

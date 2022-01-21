@@ -110,12 +110,7 @@ void RobotArm::computeNewSpeed(int joint)
 
   if ((_time - last_increment_time[joint]) >= delays[joint]) // Time for update
   {
-    //      Serial.print("AAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFF");
-    //
-    //      Serial.print("AAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFF");
-    //
-    //      Serial.print("AAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFFAAAABBBBCCCCDDDDEEEEFFFF");
-    double temp;
+   double temp;
     if (((_speeds[joint] * _speeds[joint]) / (2. * _accelerations[joint])) >= abs(distance_left)) // Need to decelerate to stop
     {
       temp = _speeds[joint] - ((_speeds[joint] > 0) ? increments[joint] : -increments[joint]);
