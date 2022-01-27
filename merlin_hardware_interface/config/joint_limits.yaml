@@ -1,3 +1,4 @@
+# NOT USED YET
 joint_limits:
   waist:
     has_position_limits: true

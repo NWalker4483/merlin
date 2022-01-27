@@ -1,56 +1,44 @@
 #!/usr/bin/env python
 import time
 from geometry_msgs.msg import Point
-from pilz_robot_programming import *
-import math
-import moveit_commander
+from pilz_robot_programming import Robot, Lin, Pose, Ptp, Sequence
 import rospy
 import numpy as np
 
 __REQUIRED_API_VERSION__ = "1"
-_DEFAULT_PLANNING_GROUP = "arm" 
-_DEFAULT_TARGET_LINK = "Face_Plate_1"
-_DEFAULT_GRIPPER_PLANNING_GROUP = "gripper"
-_DEFAULT_BASE_LINK = "base_link"
 
 rospy.init_node('robot_program_node')
 print("Executing " + __file__)
 
 r = Robot(__REQUIRED_API_VERSION__)
-group_name = "arm"
-move_group = moveit_commander.MoveGroupCommander(group_name)
 
-cut_home = Ptp(goal=np.deg2rad([27,-19,-3,144,34,139]), vel_scale=0.05, acc_scale=0.05, planning_group="arm",target_link="Face_Plate_1",reference_frame="base_link")
+cut_home = Ptp(goal=np.deg2rad([27,-17,0,150,31,146]), vel_scale=1, acc_scale=1, planning_group="arm",target_link="Face_Plate_1",reference_frame="base_link")
+one_inch = 0.0254
+cut_depth = -one_inch * 1.45
+tool_width = one_inch /2
 
-current_pose = move_group.get_current_pose().pose                        
-pose_goal = current_pose
+common_args = { 'planning_group':"arm",'target_link':"Face_Plate_1", "vel_scale":.01, "reference_frame" : "base_link"}
 
-while True:
-    sequence = Sequence()
-    r.move(cut_home)
-    step_size = 0.0254
-    step_length = step_size
-    x, y = 0, 0
-    i = 0
-    for _ in range(5):
-        move = [0, 0, 0]
-        if i % 2 == 0:
-            if i > 1:
-                move[0] = step_length
-            else:
-                move[0] = -step_length
-        else:
-            if i > 1:
-                move[1] = step_length
-            else:
-                move[1] = -step_length
-        i += 1
-        i %= 4
-        step_length += step_size 
-        print(move)
-        cut = Lin(goal=Pose(position=Point(*move)), relative=True,
-            vel_scale=0.01, acc_scale=0.01, planning_group="arm",target_link="Face_Plate_1",reference_frame="base_link")
-        sequence.append(cut)
-    print("Starting")
-    r.move(sequence)
-    time.sleep(4)
+push_in = Lin(goal= Pose(position=Point(0,0,cut_depth)), relative = True, **common_args)
+pull_out = Lin(goal= Pose(position=Point(0,0,-cut_depth)), relative = True, **common_args)
+robot_moves = [] 
+robot_moves.append(cut_home)
+robot_moves.append(push_in)
+
+max_width = one_inch * 3
+step_size = tool_width/2 # Cut with half the tool 
+for size in np.arange(0, max_width, step_size):
+    moves = [[size,0,0],[0,size,0],[-size,0,0],[0 ,-size,0],[-step_size/2,-step_size/2,0]]#[[x,y,z] ] relative_commands
+
+    for (x,y,z) in moves:
+        cut_move = Lin(goal=Pose(position=Point(x,y,z)),relative = True,**common_args)
+        robot_moves.append(cut_move)
+
+robot_moves.append(pull_out)
+robot_moves.append(cut_home)
+
+raw_input("Press ENTER to run cutting sequence")
+time.sleep(3)
+for move in robot_moves:
+    r.move(move)
+#.move(sequence)

@@ -1,5 +1,5 @@
 <launch>
-
+<include file="$(find prbt_hardware_support)/launch/fake_operation_mode_setup.launch"/>
   <!-- Pilz Command Planner Plugin for MoveIt -->
   <arg name="planning_plugin" value="pilz_industrial_motion_planner::CommandPlanner" />
 
