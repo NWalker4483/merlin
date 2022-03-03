@@ -23,9 +23,6 @@
 #include <errno.h>   // Error integer and strerror() function
 #include <fcntl.h>   // Contains file controls like O_RDWR
 #include <termios.h> // Contains POSIX terminal control definitions
-namespace serial {
-#include <unistd.h> // write(), read(), close()
-}
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -41,7 +38,6 @@ public:
   MerlinHardwareInterface(ros::NodeHandle &nh);
   ~MerlinHardwareInterface();
   void init();
-  void init_serial();
   void update(const ros::TimerEvent &e);
   void read();
   void write(ros::Duration elapsed_time);
@@ -57,9 +53,7 @@ protected:
   PosVelAccJointInterface posvelaccJointInterface;
 
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
-  
-  int serial_port;
-  std::string port_name;
+
   double loop_hz_;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   double p_error_, v_error_, e_error_;

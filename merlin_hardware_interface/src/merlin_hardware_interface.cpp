@@ -48,63 +48,7 @@ namespace merlin_hardware_interface
   }
 
   MerlinHardwareInterface::~MerlinHardwareInterface() {}
-  void MerlinHardwareInterface::init_serial()
-  {
-
-    /* Open the file descriptor in non-blocking mode */
-    serial_port = open(port_name.c_str(), O_RDWR | O_NOCTTY);
-
-    // Check for errors
-    if (serial_port < 0)
-    {
-      // ROS_ERROR("Merlin Robot Port %s Failed to connect exiting...", port_name);
-      exit( 1 );
-    }
-    
-    /* Set up the control structure */
-    struct termios toptions;
-
-    /* Get currently set options for the tty */
-    tcgetattr(serial_port, &toptions);
-
-    /* Set custom options */
-
-    /* 500000 baud */
-    cfsetispeed(&toptions, B4000000);
-    cfsetospeed(&toptions, B4000000);
-    /* 8 bits, no parity, no stop bits */
-    toptions.c_cflag &= ~PARENB;
-    toptions.c_cflag &= ~CSTOPB;
-    toptions.c_cflag &= ~CSIZE;
-    toptions.c_cflag |= CS8;
-    /* no hardware flow control */
-    toptions.c_cflag &= ~CRTSCTS;
-    /* enable receiver, ignore status lines */
-    toptions.c_cflag |= CREAD | CLOCAL;
-    /* disable input/output flow control, disable interrupt chars */
-    toptions.c_iflag &= ~(IXON | IXOFF | IXANY);
-    /* disable canonical input, disable echo,
-  disable visually erase chars,
-  disable terminal-generated signals */
-    toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    /* disable output processing */
-    toptions.c_oflag &= ~OPOST;
-
-    /* wait for 12 characters to come in before read returns */
-    /* WARNING! THIS CAUSES THE read() TO BLOCK UNTIL ALL */
-    /* CHARACTERS HAVE COME IN! */
-    toptions.c_cc[VMIN] = 4;
-    /* no minimum time to wait before read returns */
-    toptions.c_cc[VTIME] = 10;
-
-    /* commit the options */
-    tcsetattr(serial_port, TCSANOW, &toptions);
-
-    /* Wait for the Arduino to reset */
-    usleep(1000 * 1000);
-    /* Flush anything already in the serial buffer */
-    tcflush(serial_port, TCIFLUSH);
-  }
+  
   void MerlinHardwareInterface::init()
   {
     // Get joint names
