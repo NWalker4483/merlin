@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> // write(), read(), close()
 
 #include <fcntl.h>
 #include <termios.h>
@@ -38,9 +37,6 @@ namespace merlin_hardware_interface
 
     nh_.param("/merlin/hardware_interface/loop_hz", loop_hz_, 0.1);
     nh.param<std::string>("/merlin/hardware_interface/port", port_name, "/dev/ttyACM0");
-
-    // Instantiate SerialPort object.
-    init_serial();
 
     ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
     non_realtime_loop_ =
@@ -109,9 +105,6 @@ namespace merlin_hardware_interface
 
   void MerlinHardwareInterface::read()
   {
-    char msg[] = {'R'};
-    ::write(serial_port, msg, sizeof(msg));
-    open_float temp;
 
     for (int i = 0; i < 6; i++)
     {
@@ -123,8 +116,7 @@ namespace merlin_hardware_interface
 
   void MerlinHardwareInterface::write(ros::Duration elapsed_time)
   {
-    char msg[] = {'T'};
-    ::write(serial_port, msg, sizeof(msg));
+
     // positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
 
     open_float temp;

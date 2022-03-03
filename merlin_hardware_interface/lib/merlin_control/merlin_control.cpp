@@ -1,29 +1,29 @@
 #include "merlin_control.h"
 
-void MR6200()
+ MR6200::MR6200()
 {
-  // std::cout << "Starting Merlin Arm setup process\n";
-  // size_t portCount = 0;
-  // std::vector<std::string> comHubPorts;
+  std::cout << "Starting Merlin setup process\n";
+  size_t portCount = 0;
+  std::vector<std::string> comHubPorts;
 
-  // try
-  // {
-  //   SysManager::FindComHubPorts(comHubPorts); // Find Usb Ports with Hub
-  //   printf("Found %d SC Hubs\n", comHubPorts.size());
-  //   for (portCount = 0; portCount < comHubPorts.size() && portCount < NET_CONTROLLER_MAX; portCount++)
-  //   {
-  //     myMgr.ComHubPort(portCount, comHubPorts[portCount].c_str()); // define the first SC Hub port (port 0) to be associated
-  //                                                                  // with COM portnum (as seen in device manager)
-  //   }
-  //   if (portCount < 0)
-  //   {
-  //     printf("Unable to locate SC hub port\n");
-  //     msgUser("Press any key to continue."); // pause so the user can see the error message; waits for user to press a key
-  //     // TODO: Raise Error
-  //     return -1; // This terminates the main program
-  //   }
+  try
+  {
+    SysManager::FindComHubPorts(comHubPorts); // Find Usb Ports with Hub
+    printf("Found %d SC Hubs\n", comHubPorts.size());
+    for (portCount = 0; portCount < comHubPorts.size() && portCount < NET_CONTROLLER_MAX; portCount++)
+    {
+      myMgr.ComHubPort(portCount, comHubPorts[portCount].c_str()); // define the first SC Hub port (port 0) to be associated
+                                                                   // with COM portnum (as seen in device manager)
+    }
+    if (portCount < 0)
+    {
+      printf("Unable to locate SC hub port\n");
+      // msgUser("Press any key to continue."); // pause so the user can see the error message; waits for user to press a key
+      // TODO: Raise Error
+      // return -1; // This terminates the main program
+    }
 
-  //   myMgr.PortsOpen(portCount); // Open the port
+    myMgr.PortsOpen(portCount); // Open the port
   //   for (size_t i = 0; i < portCount; i++)
   //   {
   //     IPort &myPort = myMgr.Ports(i);
@@ -61,7 +61,7 @@ void MR6200()
   //       }
   //     }
   //   }
-  // }
+  }
   // catch (mnErr &theErr)
   // {
   //   printf("Failed to disable Nodes n\n");
@@ -93,16 +93,16 @@ void MR6200()
 
 void MR6200::setMotorReductions(double reductions[6][6])
 {
-  // for (int row = 0; row < 6; row++)
-  // {
-  //   for (int col = 0; col < 6; col++)
-  //   {
-  //     motor_reductions(row, col) = reductions[row][col];
-  //   }
-  // }
-  // // Pre Compute Useful Variables
-  // degrees_per_step = motor_reductions * (360.L / 800.L);
-  // Invert(degrees_per_step, degrees_per_step_inv);
+  for (int row = 0; row < 6; row++)
+  {
+    for (int col = 0; col < 6; col++)
+    {
+      motor_reductions(row, col) = reductions[row][col];
+    }
+  }
+  // Pre Compute Useful Variables
+  degrees_per_step = motor_reductions * (360.L / 800.L);
+  Invert(degrees_per_step, degrees_per_step_inv);
 }
 
 void MR6200::updateMotorSpeeds(double *speeds) 
