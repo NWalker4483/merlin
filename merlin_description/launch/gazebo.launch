@@ -1,5 +1,4 @@
 <launch>
-  
   <arg name="paused" default="false"/>
   <arg name="gazebo_gui" default="true"/>
   <arg name="urdf_path" default="$(find merlin_description)/urdf/merlin.xacro"/>
@@ -19,5 +18,4 @@
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -x 0 -y 0 -z 0"
     respawn="false" output="screen" />
 
-  <!-- <include file="$(find merlin_hardware_interface)/launch/controllers.launch"/> -->
 </launch>

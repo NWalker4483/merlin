@@ -12,7 +12,5 @@
 
 <!-- convert joint states to TF transforms for rviz, etc -->
 <node name="robot_state_publisher" output="screen" pkg="robot_state_publisher" respawn="false" type="robot_state_publisher">
-  <!-- Move Robot pipeline into namespace -->
-  <!-- <remap from="/joint_states" to="merlin/joint_states"/> -->
 </node>
 </launch>
