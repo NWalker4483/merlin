@@ -1,0 +1,3 @@
+planning_plugin: pilz_industrial_motion_planner/CommandPlanner
+request_adapters: ""
+start_state_max_bounds_error: 0.1
