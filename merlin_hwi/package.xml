@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>merlin_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>The merlin package</description>
+  <maintainer email="nilezwalker@gmail.com">Nile Walker</maintainer>
+
+  <!-- <buildtool_depend>ament_cmake</buildtool_depend> -->
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+
+  <test_depend>ament_add_gmock</test_depend>
+  <test_depend>hardware_interface</test_depend>
+
+  <export>
+    <controller_interface plugin="plugin.xml" />
+  </export>
+
+</package>

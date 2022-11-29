@@ -1,0 +1,7 @@
+<library path="merlin_hwi">
+    <class name="merlin_hwi/MerlinHardwareInterface" type="merlin_hwi::MerlinHardwareInterface" base_class_type="hardware_interface::SystemInterface">
+      <description>
+        Generic components for simple mocking of system hardware.
+      </description>
+    </class>
+</library>

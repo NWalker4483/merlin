@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(merlin_hw)
+add_compile_options(-std=c++17)
+
+find_package(ament_cmake REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)

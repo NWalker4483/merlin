@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.0.2)
-project(merlin_bringup)
+cmake_minimum_required(VERSION 3.5)
 
-find_package(catkin REQUIRED)
-
-catkin_package()
+project(my_project_variant NONE)
+find_package(ament_cmake REQUIRED)
+ament_package()
