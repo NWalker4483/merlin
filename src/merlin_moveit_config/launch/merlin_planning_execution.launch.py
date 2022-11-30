@@ -44,14 +44,14 @@ def generate_launch_description():
     ompl_config_file = get_package_file('merlin_moveit_config', 'config/ompl_planning.yaml')
     pilz_config_file = get_package_file('merlin_moveit_config', 'config/pilz_planning.yaml')
     moveit_controllers_file = get_package_file('merlin_moveit_config', 'config/controllers.yaml')
-    pipeline_config_file = get_package_file('merlin_moveit_config', 'config/planning_pipelines_config.yaml')
+    limits_config_file = get_package_file('merlin_moveit_config', 'config/joint_limits.yaml')
 
     robot_description = load_file(urdf_file)
     robot_description_semantic = load_file(srdf_file)
     kinematics_config = load_yaml(kinematics_file)
     ompl_config = load_yaml(ompl_config_file)
     pilz_config = load_yaml(pilz_config_file)
-    pipeline_config = load_yaml(pipeline_config_file)
+    limits_config = load_yaml(limits_config_file)
 
     moveit_controllers = {
         'moveit_simple_controller_manager' : load_yaml(moveit_controllers_file),
@@ -86,6 +86,7 @@ def generate_launch_description():
                 'robot_description': robot_description,
                 'use_sim_time':True,
                 'robot_description_semantic': robot_description_semantic,
+                'robot_description_planning': limits_config,
                 'robot_description_kinematics': kinematics_config,
                 'default_planning_pipeline': 'pilz',
                 'planning_pipelines': ['pilz', 'ompl'],

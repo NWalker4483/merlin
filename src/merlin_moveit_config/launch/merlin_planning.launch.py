@@ -1,166 +1,109 @@
-# Copyright 2022 ICube Laboratory, University of Strasbourg
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+import os
+import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
+from launch.actions import ExecuteProcess
+from ament_index_python.packages import get_package_share_directory
+import xacro
+
+
+def load_file(package_name, file_path):
+    package_path = get_package_share_directory(package_name)
+    absolute_file_path = os.path.join(package_path, file_path)
+
+    try:
+        with open(absolute_file_path, "r") as file:
+            return file.read()
+    except EnvironmentError:  # parent of IOError, OSError *and* WindowsError where available
+        return None
+
+
+def load_yaml(package_name, file_path):
+    package_path = get_package_share_directory(package_name)
+    absolute_file_path = os.path.join(package_path, file_path)
+
+    try:
+        with open(absolute_file_path, "r") as file:
+            return yaml.safe_load(file)
+    except EnvironmentError:  # parent of IOError, OSError *and* WindowsError where available
+        return None
 
 
 def generate_launch_description():
-    # Declare arguments
-    declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'description_package',
-            default_value='merlin_moveit_config',
-            description='Description package with robot URDF/xacro files. Usually the argument \
-                         is not set, it enables use of a custom description.',
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'description_file',
-            default_value='merlin.xacro',
-            description='URDF/XACRO description file with the robot.',
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'prefix',
-            default_value='""',
-            description='Prefix of the joint names, useful for multi-robot setup. \
-                         If changed than also joint names in the controllers \
-                         configuration have to be updated. Expected format "<prefix>/"',
-        )
-    )
-   
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'start_rviz',
-            default_value='true',
-            description='Start RViz2 automatically with this launch file.',
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'base_frame_file',
-            default_value='base_frame.yaml',
-            description='Configuration file of robot base frame wrt World.',
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            'use_sim',
-            default_value='false',
-            description='Start robot in Gazebo simulation.',
-        )
-    )
 
-    # Initialize Arguments
-    description_package = LaunchConfiguration('description_package')
-    description_file = LaunchConfiguration('description_file')
-    prefix = LaunchConfiguration('prefix')
-    start_rviz = LaunchConfiguration('start_rviz')
-    base_frame_file = LaunchConfiguration('base_frame_file')
-    use_sim = LaunchConfiguration('use_sim')
-
-    # Get URDF via xacro
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name='xacro')]),
-            ' ',
-            PathJoinSubstitution(
-                [FindPackageShare("merlin"), 'urdf', description_file]
-            ),
-            ' ',
-            'prefix:=',
-            prefix,
-            ' ',
-            'base_frame_file:=',
-            base_frame_file,
-            ' ',
-            'description_package:=',
-            description_package,
-        ]
+    # planning_context
+    robot_description_config = xacro.process_file(
+        os.path.join(
+            get_package_share_directory("merlin"),
+            "urdf",
+            "merlin.xacro",
+        )
     )
+    robot_description = {"robot_description": robot_description_config.toxml()}
 
-    robot_description = {'robot_description': robot_description_content}
-
-    # Get SRDF via xacro
-    robot_description_semantic_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare(description_package), "config", "merlin.srdf"]
-            ),
-            " ",
-            "name:=",
-            "merlin",
-            " ",
-            "prefix:=",
-            prefix,
-            " ",
-            'description_package:=',
-            description_package,
-        ]
+    robot_description_semantic_config = xacro.process_file(
+        os.path.join(
+            get_package_share_directory("merlin_moveit_config"),
+            "config",
+            "merlin.srdf",
+        )
     )
 
     robot_description_semantic = {
-        'robot_description_semantic': robot_description_semantic_content
+        "robot_description_semantic": robot_description_semantic_config.toxml()
     }
 
-    # Get planning parameters
-    robot_description_planning_joint_limits = PathJoinSubstitution([
-            FindPackageShare(description_package), "config", "joint_limits.yaml",
-        ]
+    joint_limits_yaml = load_yaml(
+        "merlin_moveit_config", "config/joint_limits.yaml"
     )
-
-    # robot_description_planning_cartesian_limits = PathJoinSubstitution([
-    #         FindPackageShare(description_package), "config", "iiwa_cartesian_limits.yaml",
-    #     ]
-    # )
-
-    move_group_capabilities = {
-        "capabilities": """pilz_industrial_motion_planner/MoveGroupSequenceAction \
-            pilz_industrial_motion_planner/MoveGroupSequenceService"""
+    pilz_cartesian_limits_yaml = load_yaml(
+        "merlin_moveit_config", "config/cartesian_limits.yaml"
+    )
+    robot_description_planning = {
+        "robot_description_planning": {
+            **joint_limits_yaml,
+            **pilz_cartesian_limits_yaml,
+        }
     }
-
-    robot_description_kinematics = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", "kinematics.yaml"]
+    kinematics_yaml = load_yaml(
+        "merlin_moveit_config", "config/kinematics.yaml"
     )
+    robot_description_kinematics = {"robot_description_kinematics": kinematics_yaml}
 
-    planning_pipelines_config = PathJoinSubstitution([
-            FindPackageShare(description_package), "config", "planning_pipelines_config.yaml",
-        ]
+    # Planning Functionality
+    planning_pipelines_config = {
+        "default_planning_pipeline": "ompl",
+        "planning_pipelines": ["pilz", "ompl"],
+        "pilz": {
+            "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner",
+            "request_adapters": "",
+            "start_state_max_bounds_error": 0.1,
+        },
+        "ompl": {
+            "planning_plugin": "ompl_interface/OMPLPlanner",
+            "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+            "start_state_max_bounds_error": 0.1,
+        },
+    }
+    ompl_planning_yaml = load_yaml(
+        "merlin_moveit_config", "config/ompl_planning.yaml"
     )
+    planning_pipelines_config["ompl"].update(ompl_planning_yaml)
 
-    ompl_planning_config = PathJoinSubstitution([
-            FindPackageShare(description_package), "config", "ompl_planning.yaml",
-        ]
+    # Trajectory Execution Functionality
+    moveit_simple_controllers_yaml = load_yaml(
+        "merlin_moveit_config", "config/controllers.yaml"
     )
-
-    moveit_controllers = PathJoinSubstitution(
-        [FindPackageShare(description_package),
-            "config", "iiwa_moveit_controller_config.yaml"]
-    )
+    moveit_controllers = {
+        "moveit_simple_controller_manager": moveit_simple_controllers_yaml,
+        "moveit_controller_manager": "moveit_simple_controller_manager/MoveItSimpleControllerManager",
+    }
 
     trajectory_execution = {
-        "moveit_manage_controllers": False,
+        "moveit_manage_controllers": True,
         "trajectory_execution.allowed_execution_duration_scaling": 1.2,
         "trajectory_execution.allowed_goal_duration_margin": 0.5,
         "trajectory_execution.allowed_start_tolerance": 0.01,
@@ -173,7 +116,8 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-    move_group_node = Node(
+    # Start the actual move_group node/action server
+    run_move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
@@ -181,43 +125,106 @@ def generate_launch_description():
             robot_description,
             robot_description_semantic,
             robot_description_kinematics,
-            # robot_description_planning_cartesian_limits,
-            robot_description_planning_joint_limits,
+            robot_description_planning,
             planning_pipelines_config,
-            ompl_planning_config,
             trajectory_execution,
-            # moveit_controllers,
+            moveit_controllers,
             planning_scene_monitor_parameters,
-            move_group_capabilities,
-            {"use_sim_time": use_sim},
         ],
     )
 
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(description_package), 'rviz', 'iiwa.rviz']
-    )
-
+    # RViz
+    # rviz_base = os.path.join(
+    #     get_package_share_directory("moveit_resources_prbt_moveit_config"), "launch"
+    # )
+    # rviz_full_config = os.path.join(rviz_base, "moveit.rviz")
     rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        output='log',
-        # arguments=['-d', rviz_config_file],
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="log",
+        # arguments=["-d", rviz_full_config],
         parameters=[
             robot_description,
             robot_description_semantic,
-            # robot_description_planning_cartesian_limits,
-            robot_description_planning_joint_limits,
+            robot_description_planning,
             robot_description_kinematics,
             planning_pipelines_config,
-            ompl_planning_config,
         ],
-        condition=IfCondition(start_rviz),
     )
 
-    nodes = [
-        move_group_node,
-        rviz_node,
-    ]
+    # Static TF
+    static_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_transform_publisher",
+        output="log",
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+    )
 
-    return LaunchDescription(declared_arguments + nodes)
+    # Publish TF
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        output="both",
+        parameters=[robot_description],
+    )
+
+    # ros2_control using FakeSystem as hardware
+    ros2_controllers_path = os.path.join(
+        get_package_share_directory("merlin"),#"merlin_moveit_config"),
+        "config",
+        "controllers.yaml",
+    )
+    ros2_control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[robot_description, ros2_controllers_path],
+        output="screen",
+    )
+
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+
+    arm_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "arm_controller",
+            "-c",
+            "/controller_manager",
+        ],
+    )
+
+    # Warehouse mongodb server
+    mongodb_server_node = Node(
+        package="warehouse_ros_mongo",
+        executable="mongo_wrapper_ros.py",
+        parameters=[
+            {"warehouse_port": 33829},
+            {"warehouse_host": "localhost"},
+            {"warehouse_plugin": "warehouse_ros_mongo::MongoDatabaseConnection"},
+        ],
+        output="screen",
+    )
+
+    return LaunchDescription(
+        [
+            rviz_node,
+            static_tf,
+            robot_state_publisher,
+            run_move_group_node,
+            ros2_control_node,
+            joint_state_broadcaster_spawner,
+            arm_controller_spawner,
+            # mongodb_server_node,
+        ]
+    )
