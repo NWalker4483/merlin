@@ -2,7 +2,6 @@
 <robot name="merlin" xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
 <transmission name="waist_tran">
-
   <type>transmission_interface/SimpleTransmission</type>
   <joint name="waist">
     <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>

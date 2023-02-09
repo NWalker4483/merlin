@@ -43,12 +43,14 @@ def generate_launch_description():
     kinematics_file = get_package_file('merlin_moveit_config', 'config/kinematics.yaml')
     ompl_config_file = get_package_file('merlin_moveit_config', 'config/ompl_planning.yaml')
     pilz_config_file = get_package_file('merlin_moveit_config', 'config/pilz_planning.yaml')
-    moveit_controllers_file = get_package_file('merlin_moveit_config', 'config/controllers.yaml')
+    pipeline_config_file = get_package_file('merlin_moveit_config', 'config/planning_pipelines_config.yaml')
+    moveit_controllers_file = get_package_file('merlin_moveit_config', 'config/moveit_controllers.yaml')
     limits_config_file = get_package_file('merlin_moveit_config', 'config/joint_limits.yaml')
 
     robot_description = load_file(urdf_file)
     robot_description_semantic = load_file(srdf_file)
     kinematics_config = load_yaml(kinematics_file)
+    pipeline_config_file = load_yaml(pipeline_config_file)
     ompl_config = load_yaml(ompl_config_file)
     pilz_config = load_yaml(pilz_config_file)
     limits_config = load_yaml(limits_config_file)
@@ -59,8 +61,10 @@ def generate_launch_description():
     }
     trajectory_execution = {
         'moveit_manage_controllers': False,
-        'trajectory_execution.allowed_execution_duration_scaling': 1.2,
-        'trajectory_execution.allowed_goal_duration_margin': 0.5,
+        # 'trajectory_execution.execution_duration_monitoring': False,
+        'trajectory_execution.allowed_execution_duration_scaling': 1e10, # 1.2,
+        'trajectory_execution.use_sim_time': 1e10, # 1.2,
+        'trajectory_execution.allowed_goal_duration_margin': 3, # 0.5,
         'trajectory_execution.allowed_start_tolerance': 0.01
     }
     planning_scene_monitor_config = {
@@ -100,16 +104,7 @@ def generate_launch_description():
             planning_scene_monitor_config,
         ],
     )
-    # TF information
-    robot_state_publisher = Node(
-        name='robot_state_publisher',
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        output='screen',
-        parameters=[
-            {'robot_description': robot_description}
-        ]
-    )
+ 
     # Visualization (parameters needed for MoveIt display plugin)
     rviz = Node(
         name='rviz',
@@ -118,37 +113,16 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {
+                'use_sim_time': True,
                 'robot_description': robot_description,
                 'robot_description_semantic': robot_description_semantic,
                 'robot_description_kinematics': kinematics_config,
             }
         ],
     )
-    # # Controller manager for realtime interactions
-    # ros2_control_node = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters= [
-    #         {'robot_description': robot_description},
-    #         ros_controllers_file
-    #     ],
-    #     output="screen",
-    # )
-    # # # Startup up ROS2 controllers (will exit immediately)
-    # spawn_controllers = []
-    # controller_names = [ 'joint_state_controller'] # , 'manipulator_joint_trajectory_controller']
-    # spawn_controllers = [
-    #     Node(
-    #         package="controller_manager",
-    #         executable="spawner",
-    #         arguments=[controller],
-    #         output="screen")
-    #     for controller in controller_names
-    # ]
 
     return LaunchDescription([
         move_group_node,
-        robot_state_publisher,
         rviz,
         ] 
     )

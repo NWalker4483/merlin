@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="merlin" xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
-
 <gazebo reference="base_link">
   <material>Gazebo/Silver</material>
   <selfCollide>true</selfCollide>

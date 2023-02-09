@@ -4,7 +4,6 @@ controller_names:
 arm_controller:
   action_ns: follow_joint_trajectory
   type: FollowJointTrajectory
-  allowed_goal_duration_margin: 3
   default: true
   joints:
     - waist

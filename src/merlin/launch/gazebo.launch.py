@@ -21,17 +21,20 @@ def generate_launch_description():
     xacro_file = os.path.join(package_path, 'urdf', 'merlin.xacro') 
     doc = xacro.parse(open(xacro_file)) 
     xacro.process_doc(doc)
-    params = {'robot_description':doc.toxml()}
 
     node_robot_state_publisher = Node( 
         package = 'robot_state_publisher',
         executable='robot_state_publisher', 
-        output='screen', 
-        parameters=[params])
+        output='both', 
+        parameters=[
+        {'robot_description':doc.toxml(),
+        "use_sim_time": True}
+        ])
 
     load_joint_state_controller = ExecuteProcess(
         cmd = ['ros2', 'control', 'load_controller','--set-state','active','joint_state_broadcaster'],
         output='screen')
+
     load_arm_controller = ExecuteProcess(
         cmd = ['ros2', 'control', 'load_controller','--set-state','active','arm_controller'],
         output='screen')
@@ -40,6 +43,7 @@ def generate_launch_description():
                         arguments=[ '-topic', '/robot_description', 
                         '-entity', 'merlin'],
                         output= 'screen') 
+                        
     return LaunchDescription([
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -52,3 +56,12 @@ def generate_launch_description():
         gazebo, 
         node_robot_state_publisher, 
         spawn_entity])
+# Removing ros-humble-pilz-industrial-motion-planner (2.5.4-1jammy.20230124.083608) ...
+# Removing ros-humble-moveit-ros-planning-interface (2.5.4-1jammy.20230124.081325) ...
+# Removing ros-humble-moveit-ros-warehouse (2.5.4-1jammy.20230120.233218) ...
+# Removing ros-humble-moveit-ros-move-group (2.5.4-1jammy.20230124.071138) ...
+# Removing ros-humble-moveit-kinematics (2.5.4-1jammy.20230120.233211) ...
+# Removing ros-humble-moveit-ros-occupancy-map-monitor (2.5.4-1jammy.20230120.230915) ...
+# Removing ros-humble-moveit-core (2.5.4-1jammy.20230120.223848) ...
+# Removing ros-humble-moveit-msgs (2.2.1-1jammy.20230112.160645) ...
+# Removing ros-humble-moveit-common (2.5.4-1jammy.20230112.142325) ...
