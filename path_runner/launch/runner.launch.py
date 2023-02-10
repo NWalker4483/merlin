@@ -107,5 +107,5 @@ def generate_launch_description():
             # rviz_node,
             # ros2_control_node,
         ]
-        + load_controllers
+        # + load_controllers
         )

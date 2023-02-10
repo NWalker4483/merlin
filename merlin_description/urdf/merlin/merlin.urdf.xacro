@@ -3,7 +3,7 @@
 <!-- top level -->
 <robot name="merlin" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <!-- include the lbr med macro -->
+    <!-- include the merlin macro -->
     <xacro:include filename="$(find merlin_description)/urdf/merlin/merlin_description.urdf.xacro"/>
 
     <xacro:arg name="robot_name" default="merlin"/>

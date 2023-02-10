@@ -3,7 +3,7 @@
 <package format="3">
   <name>merlin_bringup</name>
   <version>1.0.0</version>
-  <description>LBR launch files.</description>
+  <description>Lloyd launch files.</description>
   <maintainer email="nilezwalker@gmail.com">walkenz1</maintainer>
   <license>MIT</license>
 

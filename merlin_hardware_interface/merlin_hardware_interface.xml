@@ -3,6 +3,6 @@
     <class type="merlin_hardware_interface::MerlinHardwareInterface"
            base_class_type="hardware_interface::SystemInterface"/>
     <description>
-        ROS2 control hardware interface for KUKA LBR robots using the Fast Robot Interface (FRI).
+        ROS2 control hardware interface for Lloyd.
     </description>
 </library>

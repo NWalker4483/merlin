@@ -107,7 +107,7 @@
     </xacro:macro>
 </robot>
 
-<!-- define lbr specific state interfaces as sensor, see
+<!-- define machine specific state interfaces as sensor, see
 https://github.com/ros-controls/roadmap/blob/master/design_drafts/components_architecture_and_urdf_examples.md -->
 <!-- <xacro:unless value="${sim}">
                 <sensor name="${robot_name}_fri_sensor">

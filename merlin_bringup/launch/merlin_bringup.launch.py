@@ -30,7 +30,7 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
-    # # Load LBR FRI ROS2
+    # # Load FRI ROS2
     # merlin_spinner = IncludeLaunchDescription(
     #     PythonLaunchDescriptionSource(
     #         PathJoinSubstitution(

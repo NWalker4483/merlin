@@ -3,7 +3,7 @@
 <package format="3">
   <name>merlin_hardware_interface</name>
   <version>1.0.0</version>
-  <description>ROS2 hardware hardware_interface for KUKA LBR through Fast Robot Interface (FRI).</description>
+  <description>ROS2 hardware hardware_interface for Lloyd</description>
   <maintainer email="nilezwalker@gmail.com">walkenz1</maintainer>
   <license>MIT</license>
 
