@@ -1,7 +1,7 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="merlin_hardware_interface"
-        params="sim:=^|true remote_host:=^|INADDR_ANY port_id:=^|30200 robot_name:=^|merlin">
+        params="sim:=^|true remote_host:=^|INADDR_ANY port_id:=^|30200">
         <!-- arg for control mode -->
 
         <ros2_control name="merlin_hardware_interface" type="system">

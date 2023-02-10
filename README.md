@@ -4,9 +4,9 @@ ROS2 packages for the KUKA LBR, including communication to the real robot via th
 # First Steps
 Install [colcon](https://docs.ros.org/en/foxy/Tutorials/Colcon-Tutorial.html#install-colcon) and [rosdep](https://docs.ros.org/en/crystal/Installation/Linux-Install-Binary.html#installing-and-initializing-rosdep). Build this repository
 ```shell
-mkdir -p merlin_fri_ros2_stack_ws/src && cd merlin_fri_ros2_stack_ws
-wget https://raw.githubusercontent.com/KCL-BMEIS/merlin_fri_ros2_stack/foxy/merlin_fri_ros2_stack/repos.yml -P src
-vcs import src < src/repos.yml
+
+git clone https://github.com/NWalker4483/merlin src 
+git clone -b moveit_py https://github.com/peterdavidfagan/moveit2
 rosdep install --from-paths src --ignore-src -r -y
 colcon build
 ```

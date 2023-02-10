@@ -19,10 +19,10 @@
 #include "realtime_tools/realtime_publisher.h"
 
 namespace merlin_hardware_interface {
-class LBRHardwareInterface
+class MerlinHardwareInterface
     : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
 public:
-  LBRHardwareInterface() = default;
+  MerlinHardwareInterface() = default;
 
   // hardware interface
   hardware_interface::return_type configure(
@@ -47,13 +47,12 @@ protected:
                          const std::chrono::seconds &timeout = std::chrono::seconds(1));
 
   // setup
-  bool init_lbr_();
+  bool init_lloyd_();
   bool init_command_interfaces_();
   bool init_state_interfaces_();
   bool verify_number_of_joints_();
   bool verify_joint_command_interfaces_();
   bool verify_joint_state_interfaces_();
-  bool verify_sensors_();
   bool spawn_rt_layer_();
   bool spawn_clients_();
 
@@ -62,10 +61,6 @@ protected:
   bool disconnect_();
 
   void lbr_state_cb_(const lbr_fri_msgs::msg::LBRState::SharedPtr lbr_state);
-
-  const uint8_t LBR_FRI_STATE_INTERFACE_SIZE = 7;
-  const uint8_t LBR_FRI_COMMAND_INTERFACE_SIZE = 2;
-  const uint8_t LBR_FRI_SENSOR_SIZE = 12;
 
   // node for handling communication
   rclcpp::Node::SharedPtr node_;
@@ -89,7 +84,7 @@ protected:
 
   std::vector<double> hw_position_;
   std::vector<double> hw_commanded_joint_position_;
-  std::vector<double> hw_effort_;
+  std::vector<double> hw_velocity_;
   std::vector<double> hw_commanded_torque_;
   std::vector<double> hw_external_torque_;
   std::vector<double> hw_ipo_joint_position_;
@@ -108,7 +103,7 @@ protected:
 
   // exposed command interfaces
   std::vector<double> hw_position_command_;
-  std::vector<double> hw_effort_command_;
+  std::vector<double> hw_velocity_command_;
 
   // app connect call request
   int32_t port_id_;
@@ -130,8 +125,7 @@ protected:
   rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_ctrl_clt_;
 
   // clients to connect to / disconnect from LBR
-  rclcpp::Client<lbr_fri_msgs::srv::AppConnect>::SharedPtr app_connect_clt_;
-  rclcpp::Client<lbr_fri_msgs::srv::AppDisconnect>::SharedPtr app_disconnect_clt_;
+//   rclcpp::Client<lbr_fri_msgs::srv::AppConnect>::SharedPtr app_connect_clt_;
 
   std::unique_ptr<std::thread> node_thread_;
 };

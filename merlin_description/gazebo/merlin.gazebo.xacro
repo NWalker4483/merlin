@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <robot name="merlin" xmlns:xacro="http://www.ros.org/wiki/xacro" >
-  <xacro:macro name="merlin_gazebo" params="robot_name:=^|merlin">
+  <xacro:macro name="merlin_gazebo">
 
 <!-- ros_control-plugin -->
 <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <parameters>$(find merlin_bringup)/config/merlin_controllers.yml</parameters>
-        <robotNamespace>/${robot_name}</robotNamespace>
+        <robotNamespace>/merlin</robotNamespace>
     </plugin>
 </gazebo>
 

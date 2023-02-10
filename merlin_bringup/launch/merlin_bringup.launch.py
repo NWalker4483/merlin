@@ -10,9 +10,6 @@ from launch_ros.substitutions import FindPackageShare
 
 def launch_setup(context, *args, **kwargs):
 
-    # Evaluate frequently used variables
-    model = LaunchConfiguration("model").perform(context)
-
     # Load robot description
     robot_description_content = Command(
         [
@@ -21,7 +18,7 @@ def launch_setup(context, *args, **kwargs):
             PathJoinSubstitution(
                 [
                     FindPackageShare("merlin_description"),
-                    "urdf/{}/{}.urdf.xacro".format(model, model),
+                    "urdf/merlin/merlin.urdf.xacro",
                 ]
             ),
             " ",
@@ -93,7 +90,6 @@ def launch_setup(context, *args, **kwargs):
                 "moveit_controller_configurations",
                 LaunchConfiguration("moveit_controller_configurations"),
             ),
-            ("model", LaunchConfiguration("model")),
             ("sim", LaunchConfiguration("sim")),
         ],
     )
@@ -105,14 +101,6 @@ def generate_launch_description():
 
     # Launch arguments
     launch_args = []
-
-    launch_args.append(
-        DeclareLaunchArgument(
-            name="model",
-            default_value="merlin",
-            description="Desired LBR model. Use model:=iiwa7/iiwa14/med7/med14.",
-        )
-    )
 
     launch_args.append(
         DeclareLaunchArgument(

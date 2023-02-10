@@ -33,8 +33,7 @@ def load_file(package_name: str, file_path: str) -> str:
 
 def launch_setup(context, *args, **kwargs):
 
-    # Evaluate frequently used variables
-    model = LaunchConfiguration("model").perform(context)
+  
 
     # Configure robot_description
     robot_description = {"robot_description": LaunchConfiguration("robot_description")}
@@ -42,16 +41,12 @@ def launch_setup(context, *args, **kwargs):
     # Robot semantics SRDF
     robot_description_semantic = {
         "robot_description_semantic": load_file(
-            "merlin_moveit", "srdf/{}.srdf".format(model)
+            "merlin_moveit", "srdf/merlin.srdf"
         )
     }
 
     # Kinematics
     kinematics_yaml = load_yaml("merlin_moveit", "config/kinematics.yml")
-
-    # Update group name
-    kinematics_yaml["{}_arm".format(model)] = kinematics_yaml["group_name"]
-    del kinematics_yaml["group_name"]
 
     # Joint limits
     robot_description_planning = {
@@ -150,14 +145,6 @@ def generate_launch_description():
     launch_args.append(
         DeclareLaunchArgument(
             name="robot_description", description="Robot description XML file."
-        )
-    )
-
-    launch_args.append(
-        DeclareLaunchArgument(
-            name="model",
-            default_value="merlin",
-            description="Desired LBR model. Use model:=iiwa7/iiwa14/med7/med14.",
         )
     )
 
