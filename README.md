@@ -13,7 +13,7 @@ colcon build
 Next, launch an example via
 ```shell
 source install/setup.bash
-ros2 launch merlin_bringup merlin_bringup.launch.py model:=med7 sim:=true # model:=[iiwa7/iiwa14/med7/med14]
+ros2 launch merlin_bringup merlin_bringup.launch.py sim:=true # model:=[iiwa7/iiwa14/med7/med14]
 ```
 
 # Real Setup

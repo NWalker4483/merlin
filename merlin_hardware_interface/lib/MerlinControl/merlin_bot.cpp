@@ -81,7 +81,8 @@ public:
 				theNode.Status.AlertsClear();					//Clear Alerts on node 
 				theNode.Motion.NodeStopClear();	// Clear Nodestops on Node  				
 				theNode.Info.Ex.Parameter(98, 1); // Enable Interrupting Moves 
-                theNode.EnableReq(true);					//Enable node 
+                theNode.EnableReq(true); //Enable node 
+                
 				//At this point the node is enabled
 				printf("Node \t%zi enabled\n", iNode);
 				double timeout = myMgr->TimeStampMsec() + TIME_TILL_TIMEOUT;	//define a timeout in case the node is unable to enable
