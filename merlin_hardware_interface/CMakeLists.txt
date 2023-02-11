@@ -22,7 +22,7 @@ find_package(realtime_tools REQUIRED)
 add_library(
   ${PROJECT_NAME}
   SHARED
-  src/merlin_hardware_interface.cpp
+  # src/merlin_hardware_interface.cpp
 )
 
 # Add include directories for target
