@@ -57,10 +57,20 @@ def launch_setup(context, *args, **kwargs):
 
     # Planning
     ompl_yaml = load_yaml("merlin_moveit", "config/ompl_planning.yml")
-
+    
     planning = {
         "move_group": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
+            "request_adapters": "default_planner_request_adapters/AddTimeParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints",
+            "start_state_max_bounds_error": 0.1,
+        }
+    }
+    
+    #############################
+    
+    planning = {
+        "move_group": {
+            "planning_plugin": "pilz/CommandPlanner",
             "request_adapters": "default_planner_request_adapters/AddTimeParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints",
             "start_state_max_bounds_error": 0.1,
         }
