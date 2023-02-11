@@ -33,8 +33,6 @@ def load_file(package_name: str, file_path: str) -> str:
 
 def launch_setup(context, *args, **kwargs):
 
-  
-
     # Configure robot_description
     robot_description = {"robot_description": LaunchConfiguration("robot_description")}
 
