@@ -68,7 +68,7 @@ def launch_setup(context, *args, **kwargs):
     
     planning = {
         "move_group": {
-            "planning_plugin": "pilz/CommandPlanner",
+            "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner",
             "request_adapters": "default_planner_request_adapters/AddTimeParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints",
             "start_state_max_bounds_error": 0.1,
         }

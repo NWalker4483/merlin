@@ -7,9 +7,9 @@ position_trajectory_controller:
   type: FollowJointTrajectory
   default: true
   joints:
-    - waist
-    - shoulder
-    - elbow
-    - wrist_rotation
-    - wrist_flex
-    - hand_roll
+    - merlin_joint_0
+    - merlin_joint_1
+    - merlin_joint_2
+    - merlin_joint_3
+    - merlin_joint_4
+    - merlin_joint_5

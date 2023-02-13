@@ -1,26 +1,19 @@
-
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="merlin_hardware_interface"
-        params="sim:=^|true remote_host:=^|INADDR_ANY port_id:=^|30200">
-        <!-- arg for control mode -->
-
-        <ros2_control name="merlin_hardware_interface" type="system">
-            <!-- define hardware including parameters, also gazebo -->
+    <xacro:macro name="merlin_hardware_interface" params="sim:=^|true remote_host:=^|INADDR_ANY port_id:=^|30200">        <!-- arg for control mode -->
+        <ros2_control name="merlin_hardware_interface" type="system">            <!-- define hardware including parameters, also gazebo -->
             <xacro:if value="${sim}">
                 <hardware>
                     <plugin>gazebo_ros2_control/GazeboSystem</plugin>
                 </hardware>
             </xacro:if>
-
             <xacro:unless value="${sim}">
                 <hardware>
-                    <plugin>merlin_hwi/MerlinVelocityInterfaceHardware</plugin>
+                    <plugin>merlin_hardware_interface::MerlinHardwareInterface</plugin>
                     <param name="remote_host">${remote_host}</param>
                     <param name="port_id">${port_id}</param>
                 </hardware>
             </xacro:unless>
-
-            <joint name="waist">
+            <joint name="merlin_joint_0">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -38,8 +31,7 @@
                     <state_interface name="ipo_joint_position" />
                 </xacro:unless>
             </joint>
-
-            <joint name="elbow">
+            <joint name="merlin_joint_1">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -51,8 +43,7 @@
                 <state_interface name="velocity" />
                 <state_interface name="position" />
             </joint>
-
-            <joint name="shoulder">
+            <joint name="merlin_joint_2">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -64,8 +55,7 @@
                 <state_interface name="velocity" />
                 <state_interface name="position" />
             </joint>
-
-            <joint name="wrist_rotation">
+            <joint name="merlin_joint_3">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -77,8 +67,7 @@
                 <state_interface name="velocity" />
                 <state_interface name="position" />
             </joint>
-
-            <joint name="wrist_flex">
+            <joint name="merlin_joint_4">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -90,8 +79,7 @@
                 <state_interface name="velocity" />
                 <state_interface name="position" />
             </joint>
-
-            <joint name="hand_roll">
+            <joint name="merlin_joint_5">
                 <command_interface name="velocity">
                     <param name="min">-1</param>
                     <param name="max">1</param>
@@ -106,44 +94,3 @@
         </ros2_control>
     </xacro:macro>
 </robot>
-
-<!-- define machine specific state interfaces as sensor, see
-https://github.com/ros-controls/roadmap/blob/master/design_drafts/components_architecture_and_urdf_examples.md -->
-<!-- <xacro:unless value="${sim}">
-                <sensor name="${robot_name}_fri_sensor">
-                    <state_interface name="sample_time"/>
-                    <state_interface name="session_state"/>
-                    <state_interface name="connection_quality"/>
-                    <state_interface name="safety_state"/>
-                    <state_interface name="operation_mode"/>
-                    <state_interface name="drive_state"/>
-                    <state_interface name="client_command_mode"/>
-                    <state_interface name="overlay_type"/>
-                    <state_interface name="control_mode"/>
-
-                    <state_interface name="time_stamp_sec"/>
-                    <state_interface name="time_stamp_nano_sec"/>
-
-                    <state_interface name="tracking_performance"/>
-                </sensor>
-            </xacro:unless> -->
-
-<!-- <joint name="${robot_name}_joint_6">
-<command_interface name="position">
-    <param name="min">-1</param>
-    <param name="max"> 1</param>
-</command_interface>
-<command_interface name="effort">
-    <param name="min">-1</param>
-    <param name="max"> 1</param>
-</command_interface>
-<state_interface name="position"/>
-<state_interface name="velocity"/>
-<state_interface name="effort"/>
-<xacro:unless value="${sim}">
-    <state_interface name="commanded_joint_position"/>
-    <state_interface name="commanded_torque"/>
-    <state_interface name="external_torque"/>
-    <state_interface name="ipo_joint_position"/>
-</xacro:unless>
-</joint> -->

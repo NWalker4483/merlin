@@ -9,17 +9,17 @@ controller_manager:
       type: joint_trajectory_controller/JointTrajectoryController
 
     forward_position_controller:
-      type: position_controllers/JointGroupPositionController #forward_command_controller/ForwardCommandController
+      type: position_controllers/JointGroupPositionController 
 
 position_trajectory_controller:
   ros__parameters:
     joints:
-      - waist
-      - shoulder
-      - elbow
-      - wrist_rotation
-      - wrist_flex
-      - hand_roll
+      - merlin_joint_0
+      - merlin_joint_1
+      - merlin_joint_2
+      - merlin_joint_3
+      - merlin_joint_4
+      - merlin_joint_5
     command_interfaces:
       - position
 
@@ -27,16 +27,16 @@ position_trajectory_controller:
       - position
       - velocity
 
-    state_publish_rate: 100.0 # Defaults to 50
+    state_publish_rate: 50.0 # Defaults to 50
     action_monitor_rate: 20.0 # Defaults to 20
 
 forward_position_controller:
   ros__parameters:
     joints:
-      - waist
-      - shoulder
-      - elbow
-      - wrist_rotation
-      - wrist_flex
-      - hand_roll
+      - merlin_joint_0
+      - merlin_joint_1
+      - merlin_joint_2
+      - merlin_joint_3
+      - merlin_joint_4
+      - merlin_joint_5
     interface_name: position

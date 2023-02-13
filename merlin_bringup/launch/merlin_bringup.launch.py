@@ -22,9 +22,6 @@ def launch_setup(context, *args, **kwargs):
                 ]
             ),
             " ",
-            "robot_name:=",
-            LaunchConfiguration("robot_name"),
-            " ",
             "sim:=",
             LaunchConfiguration("sim"),
         ]
@@ -69,7 +66,7 @@ def launch_setup(context, *args, **kwargs):
                 [FindPackageShare("merlin_bringup"), "launch", "merlin_simulation.launch.py"]
             )
         ),
-        launch_arguments=[("robot_name", LaunchConfiguration("robot_name"))],
+        # launch_arguments=[("robot_name", LaunchConfiguration("robot_name"))],
         condition=IfCondition(LaunchConfiguration("sim")),
     )
 
@@ -102,11 +99,11 @@ def generate_launch_description():
     # Launch arguments
     launch_args = []
 
-    launch_args.append(
-        DeclareLaunchArgument(
-            name="robot_name", default_value="merlin", description="Set robot name."
-        )
-    )
+    # launch_args.append(
+    #     DeclareLaunchArgument(
+    #         name="robot_name", default_value="merlin", description="Set robot name."
+    #     )
+    # )
 
     launch_args.append(
         DeclareLaunchArgument(

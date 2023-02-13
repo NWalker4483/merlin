@@ -11,11 +11,11 @@ def generate_launch_description():
     # Launch arguments
     launch_args = []
 
-    launch_args.append(
-        DeclareLaunchArgument(
-            name="robot_name", default_value="merlin", description="Set robot name."
-        )
-    )
+    # launch_args.append(
+    #     DeclareLaunchArgument(
+    #         name="robot_name", default_value="merlin", description="Set robot name."
+    #     )
+    # )
 
     # Launch Gazebo
     gazebo = IncludeLaunchDescription(
@@ -37,7 +37,7 @@ def generate_launch_description():
             "-topic",
             "robot_description",
             "-entity",
-            LaunchConfiguration("robot_name"),
+            "merlin"
         ],
         output="screen",
     )

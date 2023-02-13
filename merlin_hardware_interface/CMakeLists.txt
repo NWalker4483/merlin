@@ -19,11 +19,11 @@ find_package(rclcpp REQUIRED)
 find_package(realtime_tools REQUIRED)
 
 # Define targets
-# add_library(
-#   ${PROJECT_NAME}
-#   SHARED
-  # src/merlin_hardware_interface.cpp
-# )
+add_library(
+   ${PROJECT_NAME}
+   SHARED
+   src/target.cpp
+)
 
 # Add include directories for target
 target_include_directories(
