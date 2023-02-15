@@ -27,16 +27,6 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
-    # # Load FRI ROS2
-    # merlin_spinner = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         PathJoinSubstitution(
-    #             [FindPackageShare("merlin_fri_ros2"), "launch", "merlin_spinner.launch.py"]
-    #         )
-    #     ),
-    #     condition=UnlessCondition(LaunchConfiguration("sim")),
-    # )
-
     # Load controls
     control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -66,7 +56,6 @@ def launch_setup(context, *args, **kwargs):
                 [FindPackageShare("merlin_bringup"), "launch", "merlin_simulation.launch.py"]
             )
         ),
-        # launch_arguments=[("robot_name", LaunchConfiguration("robot_name"))],
         condition=IfCondition(LaunchConfiguration("sim")),
     )
 
@@ -98,12 +87,6 @@ def generate_launch_description():
 
     # Launch arguments
     launch_args = []
-
-    # launch_args.append(
-    #     DeclareLaunchArgument(
-    #         name="robot_name", default_value="merlin", description="Set robot name."
-    #     )
-    # )
 
     launch_args.append(
         DeclareLaunchArgument(

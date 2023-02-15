@@ -210,7 +210,7 @@
                 </geometry>
             </collision>
         </link>
-
+ <static>1</static>
         <xacro:merlin_gazebo />
         <!-- TODO: move modes to args, decouple urdf/gazebo/controls -->
         <xacro:merlin_hardware_interface sim="${sim}" remote_host="INADDR_ANY" port_id="30200"/>

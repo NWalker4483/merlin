@@ -7,8 +7,7 @@
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <parameters>$(find merlin_bringup)/config/merlin_controllers.yml</parameters>
         <robotNamespace>/merlin</robotNamespace>
-    </plugin>
-</gazebo>
+    </plugin></gazebo>
 
 <gazebo reference="merlin_link_0">
   <material>Gazebo/Silver</material>
@@ -16,46 +15,46 @@
   <mu2>0.2</mu2>
   
   
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_1">
   <material>Gazebo/Red</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_2">
   <material>Gazebo/Red</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_3">
   <material>Gazebo/Red</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_4">
   <material>Gazebo/Silver</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_5">
   <material>Gazebo/Silver</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
-</gazebo>
+<gravity>0</gravity></gazebo>
 
 <gazebo reference="merlin_link_6">
   <material>Gazebo/Black</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
-</gazebo>
+<gravity>0</gravity></gazebo>
   </xacro:macro>
 </robot>

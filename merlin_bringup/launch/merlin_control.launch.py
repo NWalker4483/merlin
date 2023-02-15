@@ -62,7 +62,7 @@ def launch_setup(context, *args, **kwargs):
 
     joint_state_broadcaster = Node(
         package="controller_manager",
-        executable="spawner.py",
+        executable="spawner",
         arguments=[
             "joint_state_broadcaster",
             "--controller-manager",
@@ -72,7 +72,7 @@ def launch_setup(context, *args, **kwargs):
 
     merlin_state_broadcaster = Node(
         package="controller_manager",
-        executable="spawner.py",
+        executable="spawner",
         arguments=[
             "merlin_state_broadcaster",
             "--controller-manager",
@@ -83,7 +83,7 @@ def launch_setup(context, *args, **kwargs):
 
     controller = Node(
         package="controller_manager",
-        executable="spawner.py",
+        executable="spawner",
         arguments=[
             LaunchConfiguration("controller"),
             "--controller-manager",

@@ -11,12 +11,6 @@ def generate_launch_description():
     # Launch arguments
     launch_args = []
 
-    # launch_args.append(
-    #     DeclareLaunchArgument(
-    #         name="robot_name", default_value="merlin", description="Set robot name."
-    #     )
-    # )
-
     # Launch Gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
