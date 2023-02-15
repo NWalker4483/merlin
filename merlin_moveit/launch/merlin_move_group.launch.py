@@ -55,8 +55,8 @@ def launch_setup(context, *args, **kwargs):
         )
     }
 
-    # Planning
-    ompl_yaml = load_yaml("merlin_moveit", "config/ompl_planning.yml")
+    # # Planning
+    # ompl_yaml = load_yaml("merlin_moveit", "config/ompl_planning.yml")
     
     planning = {
         "move_group": {
@@ -131,7 +131,6 @@ def launch_setup(context, *args, **kwargs):
         "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner"
     }
     
-
     # Prepare move group node
     move_group_node = Node(
         package="moveit_ros_move_group",
@@ -139,9 +138,6 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         arguments=["--ros-args"],
         parameters=[
-            # robot_description,
-            # robot_description_semantic,
-            # kinematics_yaml,
             robot_description_planning,
             config.to_dict(),
             planning_plugin,
