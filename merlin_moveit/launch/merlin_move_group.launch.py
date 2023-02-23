@@ -54,28 +54,7 @@ def launch_setup(context, *args, **kwargs):
             [FindPackageShare("merlin_moveit"), "config/joint_limits.yml"]
         )
     }
-
-    # # Planning
-    # ompl_yaml = load_yaml("merlin_moveit", "config/ompl_planning.yml")
     
-    planning = {
-        "move_group": {
-            "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": "default_planner_request_adapters/AddTimeParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints",
-            "start_state_max_bounds_error": 0.1,
-        }
-    }
-    
-    #############################
-    
-    # planning = {
-    #     "move_group": {
-    #         "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner",
-    #         "request_adapters": "default_planner_request_adapters/AddTimeParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints",
-    #         "start_state_max_bounds_error": 0.1,
-    #     }
-    # }
-
     # Trajectory execution
     trajectory_execution = {
         "allow_trajectory_execution": True,
@@ -141,8 +120,6 @@ def launch_setup(context, *args, **kwargs):
             robot_description_planning,
             config.to_dict(),
             planning_plugin,
-            # ompl_yaml,
-            # planning,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -162,7 +139,6 @@ def launch_setup(context, *args, **kwargs):
             robot_description,
             robot_description_semantic,
             kinematics_yaml,
-            planning,
             use_sim_time,
         ],
         arguments=["-d", rviz_config],
@@ -202,6 +178,23 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name="sim",
             default_value="true",
+            description="Launch robot in simulation or on real setup.",
+        )
+    )
+
+        
+    launch_args.append(
+        DeclareLaunchArgument(
+            name="table",
+            default_value="true",
+            description="Launch robot in simulation or on real setup.",
+        )
+    )
+    
+    launch_args.append(
+        DeclareLaunchArgument(
+            name="tool",
+            default_value="basic_drill",
             description="Launch robot in simulation or on real setup.",
         )
     )

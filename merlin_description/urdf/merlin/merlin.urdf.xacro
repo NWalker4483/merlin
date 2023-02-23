@@ -3,14 +3,33 @@
 <!-- top level -->
 <robot name="merlin" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <!-- include the merlin macro --> 
-    <xacro:include filename="$(find merlin_description)/urdf/merlin/merlin_description.urdf.xacro"/>
-    
-    <xacro:arg name="sim" default="true"/>
+    <!-- include the merlin macro -->
+    <xacro:include filename="$(find merlin_description)/urdf/merlin/merlin_description.urdf.xacro" />
+    <xacro:include filename="$(find merlin_description)/urdf/turntable/turntable.urdf.xacro" />
+    <xacro:include filename="$(find merlin_description)/urdf/materials.urdf.xacro" />
+
+    <xacro:arg name="sim" default="true" />
+    <xacro:arg name="table" default="true" />
+    <xacro:arg name="tool" default="true" />
 
     <!-- fix to world -->
-    <link name="world"/>
+    <link name="world" />
 
     <!-- merlin -->
-    <xacro:merlin parent="world" sim="$(arg sim)"/>
+    <xacro:merlin parent="world" sim="$(arg sim)" />
+
+    <xacro:if value="$(arg table)">
+        <xacro:turntable parent="merlin_link_0" sim="$(arg sim)" />
+    </xacro:if>
+    
+    <xacro:unless value="false">
+        <xacro:include filename="$(find merlin_description)/urdf/tools/basic_drill.urdf.xacro" />
+        <joint name="merlin_tool_joint" type="fixed">
+            
+            <origin rpy="0 0 0" xyz="-0.008015 0.0 0.0" />
+            <parent link="merlin_link_6" />
+            <child link="tool_link_0" />
+        </joint>
+    </xacro:unless>
+
 </robot>

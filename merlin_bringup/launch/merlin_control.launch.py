@@ -91,12 +91,23 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    plate_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "plate_position_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+
     return [
         controller_manager,
         robot_state_publisher,
         joint_state_broadcaster,
         merlin_state_broadcaster,
         controller,
+        plate_controller,
     ]
 
 
@@ -130,7 +141,7 @@ def generate_launch_description():
     launch_args.append(
         DeclareLaunchArgument(
             name="controller",
-            default_value="position_trajectory_controller",
+            default_value="arm_trajectory_controller",
             description="Robot controller.",
         )
     )

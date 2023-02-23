@@ -8,7 +8,6 @@
     <xacro:property name="max_effort" value="300" />
     <xacro:property name="max_velocity" value="10" />
 
-    <xacro:include filename="$(find merlin_description)/urdf/materials.urdf.xacro" />
     <xacro:include filename="$(find merlin_description)/gazebo/merlin.gazebo.xacro" />
     <xacro:include filename="$(find merlin_description)/ros2_control/merlin.ros2_control.xacro" />
 
@@ -29,14 +28,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0 0 0" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_0.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_0.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0 0 0" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_0.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_0.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -58,14 +57,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.822325" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_1.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_1.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.822325" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_1.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_1.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -86,14 +85,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0.0 0.1778 -1.180232" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_2.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_2.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.1778 -1.180232" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_2.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_2.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -114,14 +113,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="-0.0 0.381 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_3.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_3.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="-0.0 0.381 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_3.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_3.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -142,14 +141,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0.3556 0.3048 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_4.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_4.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.3556 0.3048 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_4.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_4.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -171,14 +170,14 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0.437896 0.3048 -0.692934" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_5.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_5.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.437896 0.3048 -0.692934" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_5.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_5.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
@@ -199,18 +198,17 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0.526796 0.3048 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_6.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_6.stl" scale="0.001 0.001 0.001" />
                 </geometry>
                 <material name="silver" />
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.526796 0.3048 -0.73878" />
                 <geometry>
-                    <mesh filename="package://merlin_description/meshes/link_6.stl" scale="0.001 0.001 0.001" />
+                    <mesh filename="package://merlin_description/meshes/merlin/link_6.stl" scale="0.001 0.001 0.001" />
                 </geometry>
             </collision>
         </link>
- <static>1</static>
         <xacro:merlin_gazebo />
         <!-- TODO: move modes to args, decouple urdf/gazebo/controls -->
         <xacro:merlin_hardware_interface sim="${sim}" remote_host="INADDR_ANY" port_id="30200"/>

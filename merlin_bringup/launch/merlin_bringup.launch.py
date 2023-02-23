@@ -24,6 +24,12 @@ def launch_setup(context, *args, **kwargs):
             " ",
             "sim:=",
             LaunchConfiguration("sim"),
+            " ",
+            "table:=",
+            LaunchConfiguration("table"),
+            " ",
+            "tool:=",
+            LaunchConfiguration("tool"),
         ]
     )
 
@@ -46,6 +52,8 @@ def launch_setup(context, *args, **kwargs):
             ),
             ("controller", LaunchConfiguration("controller")),
             ("sim", LaunchConfiguration("sim")),
+            ("table", LaunchConfiguration("table")),
+            ("tool", LaunchConfiguration("tool")),
         ],
     )
 
@@ -56,6 +64,10 @@ def launch_setup(context, *args, **kwargs):
                 [FindPackageShare("merlin_bringup"), "launch", "merlin_simulation.launch.py"]
             )
         ),
+        launch_arguments=[
+            ("table", LaunchConfiguration("table")),
+            ("tool", LaunchConfiguration("tool")),
+        ],
         condition=IfCondition(LaunchConfiguration("sim")),
     )
 
@@ -77,6 +89,8 @@ def launch_setup(context, *args, **kwargs):
                 LaunchConfiguration("moveit_controller_configurations"),
             ),
             ("sim", LaunchConfiguration("sim")),
+            ("table", LaunchConfiguration("table")),
+            ("tool", LaunchConfiguration("tool")),
         ],
     )
 
@@ -92,6 +106,22 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name="sim",
             default_value="true",
+            description="Launch robot in simulation or on real setup.",
+        )
+    )
+    
+    launch_args.append(
+        DeclareLaunchArgument(
+            name="table",
+            default_value="true",
+            description="Launch robot in simulation or on real setup.",
+        )
+    )
+    
+    launch_args.append(
+        DeclareLaunchArgument(
+            name="tool",
+            default_value="basic_drill",
             description="Launch robot in simulation or on real setup.",
         )
     )
@@ -127,7 +157,7 @@ def generate_launch_description():
     launch_args.append(
         DeclareLaunchArgument(
             name="controller",
-            default_value="position_trajectory_controller",
+            default_value="arm_trajectory_controller",
             description="Robot controller.",
         )
     )

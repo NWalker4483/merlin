@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find merlin_description)/gazebo/turntable.gazebo.xacro" /> 
+<xacro:include filename="$(find merlin_description)/ros2_control/table.ros2_control.xacro" />
+
+  <!-- robot as extracted via https://github.com/syuntoku14/fusion2urdf -->
+  <xacro:macro name="turntable" params="parent:=^|world sim:=^|true">
+    <joint name="${parent}_table_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="table_link_0" />
+  </joint>
+
+    <link name="table_link_0">
+   <inertial>
+    <origin xyz="-0.7413508050757174 -5.2357762435300825e-17 0.11868345949432525" rpy="0 0 0"/>
+    <mass value="698.1660283673943"/>
+    <inertia ixx="45.196847" iyy="28.342262" izz="53.129948" ixy="0.0" iyz="-0.0" ixz="1.121058"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/turntable/table_link_0.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/turntable/table_link_0.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+    </link>
+
+    <link name="table_link_1">
+       <inertial>
+    <origin xyz="0.0010753441084664361 -3.6074720449540954e-17 0.012700000000000045" rpy="0 0 0"/>
+    <mass value="31.66553562139478"/>
+    <inertia ixx="0.41877" iyy="0.426806" izz="0.842171" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.7822 -0.0 -0.61595" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/turntable/table_link_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.7822 -0.0 -0.61595" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/turntable/table_link_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+    </link>
+
+    <joint name="plate_rotation" type="continuous">
+  <origin xyz="-0.7822 0.0 0.61595" rpy="0 0 0"/>
+      <parent link="table_link_0" />
+      <child link="table_link_1" />
+      <axis xyz="0.0 0.0 1.0" />
+    </joint>
+
+    <xacro:table_hardware_interface sim="${sim}"/>
+  </xacro:macro>
+</robot>

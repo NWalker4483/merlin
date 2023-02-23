@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<robot name="Basic" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<link name="tool_link_0">
+  <inertial>
+    <origin xyz="4.750886484983361e-16 0.05871205780670327 -0.04066285802899884" rpy="0 0 1.570796"/>
+    <mass value="25.847802304165313"/>
+    <inertia ixx="0.178499" iyy="0.186552" izz="0.051426" ixy="-0.0" iyz="0.001879" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 1.570796"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/tools/basic_drill.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 1.570796"/>
+    <geometry>
+      <mesh filename="package://merlin_description/meshes/tools/basic_drill.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+<link name = "tool_link_tip"/>
+  <joint name="tool_joint_tip" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.06080 0.0 -0.26560" />
+  <parent link="tool_link_0" />
+  <child link="tool_link_tip" />
+</joint>
+</robot>
