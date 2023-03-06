@@ -1,0 +1,487 @@
+import bpy, bmesh
+from mathutils import Vector, Euler
+import math
+import copy 
+FPS = 24
+
+#### Generalized Utils 
+
+def rotate_z_axis(x, y, z, radians):
+    # Perform the rotation
+    x_new = x * math.cos(radians) - y * math.sin(radians)
+    y_new = x * math.sin(radians) + y * math.cos(radians)
+    z_new = z
+
+    # Return the rotated coordinates
+    return x_new, y_new, z_new
+
+def euler_to_ijk(euler_angles):
+    x, y, z = euler_angles
+    rotation = Euler((x, y, z), 'XYZ')
+    i, j, k = rotation.to_matrix() @ Vector((0, 0, 1))
+    return i, j, k
+
+def ijk_to_euler(normal):
+    normal = Vector(normal)
+    rotation = normal.to_track_quat('Z', 'Y').to_euler('XYZ')
+    return rotation.x, rotation.y, rotation.z
+
+def full_angle_about_origin(x,y):
+    angle = math.atan2(y, x)
+    if angle < 0:
+        angle += 2 * math.pi
+    return angle
+
+def snap_object_to_origin(object):
+    ######## Snap Target to zero
+    minz = 1e8
+    maxz = -1
+    for vertex in object.data.vertices:
+        # object vertices are in object space, translate to world space
+        v_world = object.matrix_world @ Vector((vertex.co[0],vertex.co[1],vertex.co[2]))
+        if v_world[2] < minz:
+            minz = v_world[2]
+        if v_world[2] > maxz:
+            maxz = v_world[2]
+    object.location.z = object.location.z - minz
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+def minimize_objects_angular_distance(objects):
+    for i in range(1, len(objects)):
+        for ax in range(3):
+            diff = objects[i][1][ax] - objects[i-1][1][ax]
+            diff = diff % (2*math.pi)
+            if diff > math.pi:
+                diff -= 2*math.pi
+            elif diff < -math.pi:
+                diff += 2*math.pi
+            objects[i][1][ax] = objects[i-1][1][ax] + diff
+    return objects
+
+def pointInsideMesh(point, object):
+    axes = [ Vector((1,0,0)) , Vector((0,1,0)), Vector((0,0,1))  ]
+    outside = False
+    for axis in axes:
+        orig = point
+        count = 0
+        while True:
+            hit,location,normal,index = object.ray_cast(orig,orig+axis*10000.0)
+            if index == -1: break
+            count += 1
+            orig = location + axis*0.00001
+        if count%2 == 0:
+            outside = True
+            break
+    return not outside
+
+def bmesh_copy_from_object(obj, transform=True, triangulate=True, apply_modifiers=False):
+    """
+    Returns a transformed, triangulated copy of the mesh
+    """
+
+    assert(obj.type == 'MESH')
+
+    if apply_modifiers and obj.modifiers:
+        me = obj.to_mesh(bpy.context.scene, True, 'PREVIEW', calc_tessface=False)
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        bpy.data.meshes.remove(me)
+    else:
+        me = obj.data
+        if obj.mode == 'EDIT':
+            bm_orig = bmesh.from_edit_mesh(me)
+            bm = bm_orig.copy()
+        else:
+            bm = bmesh.new()
+            bm.from_mesh(me)
+
+    # Remove custom data layers to save memory
+    for elem in (bm.faces, bm.edges, bm.verts, bm.loops):
+        for layers_name in dir(elem.layers):
+            if not layers_name.startswith("_"):
+                layers = getattr(elem.layers, layers_name)
+                for layer_name, layer in layers.items():
+                    layers.remove(layer)
+
+    if transform:
+        bm.transform(obj.matrix_world)
+
+    if triangulate:
+        bmesh.ops.triangulate(bm, faces=bm.faces)
+
+    return bm
+
+def bmesh_check_intersect_objects(obj, obj2):
+    # https://blender.stackexchange.com/questions/9073/how-to-check-if-two-meshes-intersect-in-python
+    """
+    Check if any faces intersect with the other object
+
+    returns a boolean
+    """
+    assert(obj != obj2)
+
+    # Triangulate
+    bm = bmesh_copy_from_object(obj, transform=True, triangulate=True)
+    bm2 = bmesh_copy_from_object(obj2, transform=True, triangulate=True)
+
+    # If bm has more edges, use bm2 instead for looping over its edges
+    # (so we cast less rays from the simpler object to the more complex object)
+    if len(bm.edges) > len(bm2.edges):
+        bm2, bm = bm, bm2
+
+    # Create a real mesh (lame!)
+    scene = bpy.context.scene
+    me_tmp = bpy.data.meshes.new(name="~temp~")
+    bm2.to_mesh(me_tmp)
+    bm2.free()
+    obj_tmp = bpy.data.objects.new(name=me_tmp.name, object_data=me_tmp)
+    # scene.objects.link(obj_tmp)
+    bpy.context.collection.objects.link(obj_tmp)
+    ray_cast = obj_tmp.ray_cast
+
+    intersect = False
+
+    EPS_NORMAL = 0.000001
+    EPS_CENTER = 0.01  # should always be bigger
+
+    #for ed in me_tmp.edges:
+    for ed in bm.edges:
+        v1, v2 = ed.verts
+
+        # setup the edge with an offset
+        co_1 = v1.co.copy()
+        co_2 = v2.co.copy()
+        co_mid = (co_1 + co_2) * 0.5
+        no_mid = (v1.normal + v2.normal).normalized() * EPS_NORMAL
+        co_1 = co_1.lerp(co_mid, EPS_CENTER) + no_mid
+        co_2 = co_2.lerp(co_mid, EPS_CENTER) + no_mid
+
+        success, co, no, index = ray_cast(co_1, (co_2 - co_1).normalized(), distance = ed.calc_length())
+        if index != -1:
+            intersect = True
+            break
+
+    # scene.objects.unlink(obj_tmp)
+    bpy.context.collection.objects.unlink(obj_tmp)
+    bpy.data.objects.remove(obj_tmp)
+    bpy.data.meshes.remove(me_tmp)
+    return intersect
+
+def ray_cast_from_to(origin, target, collision_object, mark=True):
+    direction = target - origin
+    direction.normalize()
+    hit,location,normal,face_index = collision_object.ray_cast(origin, direction)
+    
+#    hit, location, normal, face_index, _, _ = scene.ray_cast(depsgraph, origin, direction)
+    return [hit, location, normal, face_index]
+###############################################################
+
+class CAMTask:
+    def __init__(self, target, tool):
+        self._keypoints = [] 
+        self.TARGET = target
+        self.TOOL = tool
+        self.TOOL.rotation_mode = "XYZ"
+    def get_keypoints(self):
+        return copy.deepcopy(self._keypoints)
+    def build(self):
+        return
+    def remove_unreachable_keypoints(self):
+        marks = []
+        for (location, rotation_euler) in self._keypoints:
+            bpy.context.view_layer.objects.active = self.TOOL
+            self.TOOL.location = location
+            self.TOOL.rotation_euler = rotation_euler
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+            if not bmesh_check_intersect_objects(self.TOOL, self.TARGET):
+                marks.append((location, rotation_euler))
+        self._keypoints = marks   
+
+class FollowKeypoints(CAMTask):
+    def __init__(self, target, tool, keypoints = []):
+        super().__init__(target=target, tool=tool)
+        self._keypoints = keypoints
+  
+class LinearTransition(CAMTask):
+    def __init__(self, target, tool):
+        super().__init__(target, tool)
+
+class RadialTransition(CAMTask):
+    def __init__(self, target, tool):
+        super().__init__(target, tool)
+
+class ContourTrace(CAMTask):
+    def __init__(self, target, tool, center, plane_normal = Vector((0,0,1))):
+        super().__init__(target, tool)
+        self.center = center
+        self.plane_normal = plane_normal
+        self.contour = None
+          
+    def sample_for_normals(self, offset=0):
+        for vert in self.contour.data.vertices:
+            point = Vector((vert.co.x, vert.co.y, vert.co.z))
+            result = [False]
+            for p1 , p2 in [((.5,.5,0), (-.5,-.5,0)), ((-.5,.5,0), (.5,-.5,0))]: # Box Corners
+                v1,v2 = point + Vector(p1) * .25, point + Vector(p2) * .25
+                if pointInsideMesh(v1,self.TARGET) and not pointInsideMesh(v2,self.TARGET):
+                    result = ray_cast_from_to(v2,v1, self.TARGET)
+                    break
+                elif pointInsideMesh(v2,self.TARGET) and not pointInsideMesh(v1,self.TARGET):
+                    result = ray_cast_from_to(v1,v2,self.TARGET)
+                    break
+            if result[0]: 
+                hit, location, normal, face_index = result
+                rotation_euler = normal.to_track_quat('Z', 'Y').to_euler("XYZ")
+                location = location + (normal * offset)
+                self._keypoints.append([location, rotation_euler])  
+                             
+    def get_contour(self):
+        bm = bmesh.new()
+        bm.from_mesh(self.TARGET.data)
+       
+        cut = bmesh.ops.bisect_plane(
+                bm,
+                plane_co=self.center,
+                plane_no=self.plane_normal,
+                geom=bm.verts[:] + bm.faces[:] + bm.edges[:],
+                clear_inner=True,
+                clear_outer=True,
+                )["geom_cut"]
+        
+        if not cut:
+            bm.clear()
+            return
+        
+        me = bpy.data.meshes.new(f"Slice")
+        bm.to_mesh(me)
+ 
+        slice = bpy.data.objects.new(f"Slice", me)
+        slice.matrix_world = self.TARGET.matrix_world
+        self.contour = slice
+        bm.clear()   
+        
+        slice.modifiers.new(name='Subdivision', type='SUBSURF')
+        slice.modifiers["Subdivision"].levels = 4
+        slice.modifiers["Subdivision"].subdivision_type = 'SIMPLE'
+        bpy.context.scene.collection.objects.link(slice)
+        bpy.context.view_layer.objects.active = slice
+        bpy.ops.object.modifier_apply(modifier="Subdivision")
+        # bpy.context.scene.collection.objects.unlink(slice)
+    
+    def build(self):
+        self.get_contour()
+        if self.contour != None:
+            # Define a function to get the angle between a location vector and the Z axis
+            def get_angle_z(obj):
+                location, rotation = obj
+                return math.atan2(location.y, location.x)
+
+            self.sample_for_normals(offset = .0)
+#            self.remove_unreachable_keypoints()
+            self._keypoints = sorted(self._keypoints, key=get_angle_z)
+            self._keypoints = minimize_objects_angular_distance(self._keypoints)
+
+class MultiContourTrace(CAMTask):
+    def __init__(self, target, tool, start = Vector((0,0,0)), height = 10, cuts = 1,plane_normal=Vector((0,0,1))):
+        super().__init__(target, tool)
+        self.start = start
+        self.cuts = cuts
+        self.sub_tasks = [] 
+        self.height=height
+        
+    def get_keypoints(self):
+        points = []
+        for task in self.sub_tasks:
+            points += task.get_keypoints()
+        return points
+    
+    def build(self):
+        start = self.start
+        end = self.start.copy()
+        # TODO Adjust Plane Normal
+        end.z += self.height
+        
+        axis = end - start
+        dv = axis / self.cuts
+        
+        for i in range(self.cuts + 1):
+            plane_co = self.start + i * dv
+            task = ContourTrace(self.TARGET, self.TOOL, center=plane_co, plane_normal=axis)
+            task.build()
+            self.sub_tasks.append(task)
+
+class Rotary_Job:
+    def __init__(self, target, tool, angles = []):
+        self.TARGET = target 
+        self.angles = angles
+    
+    def animate(self):
+        self.TARGET.animation_data_clear()
+        frame_num = 0             
+        for i, angle in enumerate(self.angles):
+            frame_num += 1
+            self.TARGET.rotation_euler.z = angle 
+            self.TARGET.keyframe_insert(data_path='rotation_euler', frame=frame_num)
+        bpy.context.scene.frame_end = frame_num #+ 50
+
+class XYZIJK_Job:
+    def __init__(self, target, tool, tasks = [], origin=Vector((0,0,0))):
+        self.TOOL = tool   
+        self.TARGET = target
+        self.job_origin = origin
+        self.tasks = tasks
+        self._keypoints_collection = None
+        self.id = id(self)
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        if not "Keypoints" in bpy.data.collections:
+            keypoints_collection = bpy.data.collections.new("Keypoints")
+            bpy.context.scene.collection.children.link(keypoints_collection)
+        else:
+            keypoints_collection = bpy.data.collections.get("Keypoints")
+ 
+        # Ensure collections are at the root level
+        bpy.context.scene.collection.children.unlink(keypoints_collection)
+        bpy.context.scene.collection.children.link(keypoints_collection)
+#        bpy.ops.object.delete({"selected_objects": keypoints_collection.objects})
+        self._keypoints_collection = keypoints_collection
+        
+    def mark_keypoints(self, mark_length = 0.1):
+        # Create a new mesh to represent the line
+        verts = [Vector((0, 0, 0)), Vector((0, 0, mark_length))]
+        edges = [(0, 1)]
+        line_mesh = bpy.data.meshes.new("LineMesh")
+        line_mesh.from_pydata(verts, edges, [])
+        line_mesh.update()
+        # Create a new object to represent the line
+        for task in self.tasks:
+            for location, rotation_euler in task.get_keypoints():
+                line_obj = bpy.data.objects.new("Line", line_mesh)
+                line_obj.location = location
+                line_obj.rotation_euler = rotation_euler
+                self._keypoints_collection.objects.link(line_obj)
+
+    def animate(self):
+        self.TOOL.animation_data_clear()
+        frame_num = 0             
+        for i, task in enumerate(self.tasks):
+            for location, rotation_euler in task.get_keypoints():
+                frame_num += 2   
+                self.TOOL.location = location 
+                self.TOOL.rotation_euler = rotation_euler
+                self.TOOL.keyframe_insert(data_path='rotation_euler', frame=frame_num)
+                self.TOOL.keyframe_insert(data_path='location', frame=frame_num)
+        bpy.context.scene.frame_end = frame_num #+ 50
+        
+    def build(self):
+        [task.build() for task in self.tasks]
+        
+    def add_task(self, task):
+        self.tasks.append(task)
+        
+    def get_tasks(self):
+        pass
+        
+    def import_gcode(self, path="/Users/walkenz1/Desktop/test.job"):
+        with open(path,"r") as out:
+            lines= out.readlines()
+            points = []
+            for line in lines:
+                x,y,z,i,j,k = line.split(",")
+                location = [float(i.strip()[1:]) for i in [x,y,z]]
+                normal = [float(p.strip()[1:]) for p in [i,j,k]]
+                
+                points.append((location, ijk_to_euler(normal)))
+        
+        key_task = FollowKeypoints(tool=self.TOOL, target=self.TARGET, keypoints=points)
+        self.add_task(key_task)
+        
+    def export_gcode(self, path="/Users/walkenz1/Desktop/test.job"):
+        # Animate and Save
+        with open(path,"w") as out:
+            for i, task in enumerate(self.tasks):
+                for location, rotation_euler in task.get_keypoints():
+                    I,J,K = euler_to_ijk(rotation_euler)
+                    out.write(f"X{location.x}, Y{location.y}, Z{location.z}, I{I}, J{J}, K{K}\n")
+                                    
+def introduce_p_axis(raw_job):
+    max_d_theta = 0 # math.pi/4
+    points = [] 
+    angles = []
+    for task in raw_job.tasks.copy():
+        for i,(location, rotation) in enumerate(task.get_keypoints()):   
+            rotation = list(rotation)
+            angle = full_angle_about_origin(location[0], location[1])
+            d_theta = 0 
+            if angle > max_d_theta:
+                pass
+            d_theta =  angle - max_d_theta
+            location = rotate_z_axis(*location, -d_theta)
+            rotation[2] += -d_theta
+            
+            points.append([location, rotation])
+            angles.append(-d_theta)
+            
+    points = minimize_objects_angular_distance([points])[0]
+                
+    key_task = FollowKeypoints(tool=raw_job.TOOL, target=raw_job.TARGET, keypoints=points)
+    new_job = XYZIJK_Job(tool=raw_job.TOOL, target=raw_job.TARGET, tasks = [key_task])
+    turns = Rotary_Job(tool=raw_job.TOOL, target=raw_job.TARGET, angles=angles)
+    return new_job, turns
+
+####### SETUP ########
+TARGET = bpy.data.objects["TARGET"]
+TOOL = bpy.data.objects["tool_control"]
+TOOL.animation_data_clear()
+TARGET.animation_data_clear()
+####### Simplify Model ########
+bpy.context.view_layer.objects.active = TARGET
+bpy.ops.object.mode_set(mode='EDIT')
+bpy.ops.mesh.dissolve_limited()
+bpy.ops.object.mode_set(mode='OBJECT')
+##########Correct Object Origig
+
+####### Snap to table bone ########
+armature_name = "merlin"
+bone_name = "table_1"
+armature = bpy.data.objects[armature_name]
+bone = armature.pose.bones[bone_name]
+global_position = armature.matrix_world @ bone.head
+global_position.z += .025
+TARGET.location = global_position
+#TARGET.location
+bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+#snap_object_to_origin(TARGET)
+#####
+if "Keypoints" in bpy.data.collections:
+    keypoints_collection = bpy.data.collections.get("Keypoints")
+    # Ensure both collections are at the root level
+    bpy.context.scene.collection.children.unlink(keypoints_collection)
+    bpy.context.scene.collection.children.link(keypoints_collection)
+    bpy.ops.object.delete({"selected_objects": keypoints_collection.objects})
+
+# // Define some default parameters for toolpath generation
+# toolDiameter = 0.25  // Diameter of the cutting tool in inches
+# stepover = 0.1  // Percentage of tool diameter to use for each pass
+# clearanceHeight = 1.0  // Height at which the tool should move between cuts
+# cutDepth = -0.1  // Depth of each cut (negative value means cutting into the material)
+
+### Process BlenderCAM
+job = XYZIJK_Job(tool=TOOL, target=TARGET)
+job.add_task(MultiContourTrace(TARGET, TOOL, start = Vector((0,0,0)), height = 1,cuts = 25 ))
+job.build()
+job.mark_keypoints(.025)
+job.animate()
+#job.export_gcode()
+
+#job2 = XYZIJK_Job(tool=TOOL, target=TARGET)
+#job2.import_gcode()
+#job2.mark_keypoints()
+#job2.animate()
+
+#job3,rot_job = introduce_p_axis(job2)
+#job3.mark_keypoints()
+#job3.mark_keypoints()
+
+#job3.animate()
+#rot_job.animate()
